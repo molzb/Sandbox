@@ -1,0 +1,2 @@
+mklink /J C:\Users\Bernhard\Documents\NetBeansProjects\Sandbox\build\web\protected\file_upload C:\export\apps\tradefnd\tomcat\webapps\tradefnd\protected\file_upload
+mklink /J C:\Users\Bernhard\Documents\NetBeansProjects\Sandbox\web\protected\file_upload C:\export\apps\tradefnd\tomcat\webapps\tradefnd\protected\file_upload

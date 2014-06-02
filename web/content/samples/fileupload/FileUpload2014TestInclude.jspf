@@ -1,0 +1,124 @@
+		<link type="text/css" rel="stylesheet" href="resources/css/FileUpload2014.css">
+		<link type="text/css" rel="stylesheet" href="https://google-code-prettify.googlecode.com/svn/loader/prettify.css">
+		<script src="https://google-code-prettify.googlecode.com/svn/trunk/src/prettify.js"></script>
+		<script type="text/javascript">$(document).ready(function() { prettyPrint(); });</script>
+		
+		<div id="uploadTestLinks">
+			<br>
+			<a href="TradeFinderServlet?menu_selection=sandbox_fileupload">[Overview]</a>
+			<a href="TradeFinderServlet?menu_selection=fileuploadsample1">[Example 1: Minimal]</a>
+			<a href="TradeFinderServlet?menu_selection=fileuploadsample2">[Example 2: Prefix]</a>
+			<a href="TradeFinderServlet?menu_selection=fileuploadsample3">[Example 3: Callback]</a>
+			<a href="TradeFinderServlet?menu_selection=fileuploadsample4">[Example 4: Multiple]</a>
+			<a href="TradeFinderServlet?menu_selection=fileuploadsample5">[Example 5: Preview]</a>
+			<a href="TradeFinderServlet?menu_selection=fileuploadsample6">[Example 6: Permission]</a>
+			<a href="TradeFinderServlet?menu_selection=fileuploadsample7">[Example 7: Upload cmds]</a>
+			<a href="TradeFinderServlet?menu_selection=fileuploadsamplejq">[Example 8: JQuery]</a>
+		</div><br/>
+		<hr/>
+
+		<h1>&lt;tf:upload&gt;</h1>
+		
+		<div id="uploadTest">
+			The Upload Tag <b>&lt;tf:upload&gt;</b> is based on 
+			<a href="http://blueimp.github.io/jQuery-File-Upload/">JQuery File Upload</a>.<br/><br/>
+			JQuery File Upload widget has multiple file selection, drag&amp;drop support and progress bar for jQuery.<br/>
+			It supports cross-domain, chunked and resumable file uploads.<br/><br/>
+			
+			<b>Why?</b> Right now there are lots of implementations (&lt;80!) for a simple File Upload in Tradefinder.
+			This component is thought to be an replacement for all self-written components.<br/><br/>
+			
+			<b>How does it work?</b>
+			In short: It copies your uploaded file into the directory you stated in the DB table FILE_SCREENER.<br/>
+			In detail (technically):<br/>
+			When you drag a file from your desktop and drop it onto the 'Upload' button, ...<br/>
+			a) it checks, if the user is permitted to do a file upload and does some other validations<br/>
+			b) it looks into the DB (table FILE_SCREENER), if there is a directory defined for your 'upload command'<br/>     
+			c) it copies the file to a temporary folder (.../protected/file_upload/_virus_scan)<br/>
+			d) a command-line virus scanner (currently mocked) scans the file,<br/>
+			e) if the file is virus free, it will be moved to the target directory (the one in the DB table FILE_SCREENER)<br/>
+			f) Optionally the uploader gives feedback in Java/JS and shows previews 
+			   (for images and text files of the uploaded files)<br/><br/>
+
+			<b>Requirements</b>:<br/> 
+			    a) HTML5 document, e.g. Tradefinder2.jsp with doctype, Tradefinder3.jsp, Tradefinder4.jsp or Tiles.<br/>
+				b) The DB table FILESCREENER needs to have an entry for your upload command.<br/>
+				c) The upload directory needs to be writable, check the file permissions with chmod<br/><br/>
+
+			<b>Noteworthy</b>: 
+			IE8 doesn't support full HTML5 capabilities, so this version is limited on IE8<br/>
+			Fileupload gives you direct calls to permission scan and virus scan, e.g.<br/>
+			<ul>
+				<li>
+					<a href="fileupload/uploadFileToServer.disp?uploadCmd=histsim">
+						Endpoint for File Upload
+					</a>
+				</li>
+				<li>
+					<a href="fileupload/isPermitted.disp?permission=histsim_var">Permission Check</a>	
+					Does the current user have a certain permission?
+				</li>
+				<li>
+					<a href="fileupload/permissionAndVirusScan.disp?uploadCmd=histsim&filename=xxx.txt">
+						Permission and virus scan
+					</a>
+				</li>
+				<li>
+					<a href="fileupload/virusScan.disp?filename=xxx.txt">Virus scan</a>
+					Scans a file in the virus scan directory (<code>fileupload/_virus_scan</code>)
+				</li>
+				<li>
+					<a href="fileupload/deleteFileFromServer.disp?filename=thisFileDoesntExist.txt&uploadCmd=histsim">
+						Delete a file
+					</a>
+					in the upload directory (<code>fileupload</code>). 
+					 For this example, a 'FILE_NOT_FOUND' will be thrown
+				</li>
+				<li>
+					<a href="fileupload/uploadDirAndPermission.disp?uploadCmd=histsim">
+						Get the upload dir and the required permission
+					</a>
+					semicolon separated
+				</li>
+				<li>
+					<a href="fileupload/permissionToUploadCmd.disp">
+						Get the mapping from your permission to a db field FILE_SCREENER.upload_cmd
+					</a>
+					semicolon separated
+				</li>
+				<li>
+					<a href="fileupload/excerptFromUploadedFile.disp?filename=hallo.txt&uploadCmd=tso">
+						Excerpt from a text file
+					</a>
+					Preview of text files, reduced to 3 lines with up to 30 chars per line
+			</ul>
+			<b>Attributes</b>:<br/>
+			<span class="blk">maxsize</span>Maximum size of the upload in KB. <b>Required</b><br/>
+			<span class="blk">suffices</span>Allowed suffices - pipe separated, e.g. 'csv|txt'. <b>Required</b><br/>
+			<span class="blk">uploadCmd</span>Id of the command, see TF_SCREENER.UPLOAD_CMD. <b>Required</b><br/>
+			<span class="blk">multiple</span>Multiple File Upload, set to true or false. Default: false<br/>
+			<span class="blk">filenamePrefix</span>Prefix for the uploaded file, i.e. you might want to set 
+			sth. like ${user}_${date}_<br/>
+			<span class="blk">javaCallback</span>Define your own processing of the file. If not set,
+				the file will be uploaded unaltered.<br/>
+			<span class="blk">javascriptCallback</span>Define your own javascript function that will be called 
+			after the file(s) has been upload.<br/>
+			<span class="blk">label</span>Set the text of the upload button<br/>
+			<span class="blk">preview</span>Preview of the uploaded files (graphics files, txt files)<br/>
+			<span class="blk">showPermissionsInSelectTag</span>Select by permission, which in turn changes the 
+			upload command, set to true or false. Default: false<br/>
+			<span class="blk">showUploadCmdsInSelectTag</span>Select by upload command (comma separated list),
+				e.g. 'histsim,tso'.Default: empty<br/>
+			<br/>
+			
+			<b>Troubleshooting</b>:<br/>
+			<ul>
+				<li>The prefix for the taglibrary might already defined. 
+					Example: You have
+					<pre>&lt;%@taglib prefix="tf" uri="http://tradefinder.db.com/tags/tradefinder" %&gt;</pre>
+					<b>AND</b><br/>
+					<pre>&lt;%@taglib prefix="tf" uri="WEB-INF/tags" %&gt;</pre><br/><br/>
+					This will fail. Please rename the prefix and it will work fine.
+				</li>
+			</ul>
+		</div>

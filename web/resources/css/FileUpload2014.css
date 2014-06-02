@@ -1,0 +1,196 @@
+/**
+* FileUpload 2014
+* This is a reduced version of Bootstrap containing only the necessary styles for the FileUpload-Tag
+*/
+
+code.js { border: 1px solid #CCCCCC; border-radius: 4px; }
+#uploadDivWrapper { font-size: 13px; }
+
+#uploadDivWrapper #selectPermissionDiv,
+#uploadDivWrapper #selectUploadCmdsDiv { display: inline-block; }
+
+#uploadDivWrapper .preview.hidden  { display: none; }
+#uploadDivWrapper .preview.visible { display: block; }
+#uploadDivWrapper #selectTagVisible.hidden  { display: none; }
+#uploadDivWrapper #selectTagVisible.visible { display: block; }
+
+#uploadDivWrapper #cancelUpload { display: none; }
+
+.tagSource { color: #0098DB; font-weight: bold;}
+.tagSource pre {
+	color: black;
+	font-family: monospace;
+	font-size: 13px;
+}
+.tagSource .highlight { color: #0098DB; }
+
+.htmlSource a, #uploadTest a, #uploadTestLinks a {
+	font-weight: bold; 
+	text-decoration: none;
+	color: #0098DB;
+}
+.htmlSource a:hover, #uploadTest a:hover, #uploadTestLinks a:hover {
+	text-decoration: underline;
+}
+#uploadTest span.blk {
+	font-style: italic;
+	width: 200px;
+	display: inline-block;
+}
+
+.htmlSource pre { text-decoration: none; color: black; font-family: monospace; }
+.fileinput-button {
+    overflow: hidden;
+    position: relative;
+}
+.btn-danger {
+    background-color: #D9534F;
+    border-color: #D43F3A;
+    color: #FFFFFF;
+}
+.btn-danger:hover, .btn-danger:focus, .btn-danger:active, .btn-danger.active, .open .dropdown-toggle.btn-danger {
+    background-color: #D2322D;
+    border-color: #AC2925;
+    color: #FFFFFF;
+}
+.btn-success {	
+    background-color: #5CB85C;
+    border-color: #4CAE4C;
+    color: #FFFFFF;
+}.btn-success:hover, .btn-success:focus, .btn-success:active, .btn-success.active, .open .dropdown-toggle.btn-success {
+    background-color: #47A447;
+    border-color: #398439;
+    color: #FFFFFF;
+}
+.btn-warning {
+    background-color: #F0AD4E;
+    border-color: #EEA236;
+    color: #FFFFFF;
+}
+.btn-warning:hover, .btn-warning:focus, .btn-warning:active, .btn-warning.active, .open .dropdown-toggle.btn-warning {
+    background-color: #ED9C28;
+    border-color: #D58512;
+    color: #FFFFFF;
+}
+.btn {
+    -moz-user-select: none;
+    background-image: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.42857;
+    margin-bottom: 0;
+    padding: 6px 12px;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+span.uploadSpan {
+	font-size: 13px; color: white;
+}
+
+#uploadDivWrapper .table { width: 100%; }
+#uploadDivWrapper .table tbody tr td {
+    border-top: 1px solid #DDDDDD;
+    line-height: 1.42857;
+    padding: 8px;
+    vertical-align: top;
+}
+#uploadDivWrapper .table tbody tr td { background-color: #F0F0F0; }
+#uploadDivWrapper .table tbody tr td.odd  { background-color: #F9F9F9; }
+#uploadDivWrapper .table tbody tr td.even { background-color: white; }
+
+
+.fileinput-button input {
+    cursor: pointer;
+    direction: ltr;
+    font-size: 200px;
+    margin: 0;
+    opacity: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+input[type="file"] {
+    display: block;
+}
+.progress {
+    background-color: #F5F5F5;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) inset;
+    height: 20px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+.progress-bar-success {
+    background-color: #5CB85C;
+}
+.progress-bar {
+    box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.15) inset;
+    color: #FFFFFF;
+    float: left;
+    font-size: 12px;
+    height: 100%;
+    line-height: 20px;
+    text-align: center;
+    transition: width 0.6s ease 0s;
+    width: 0;
+}
+
+.alert-message.block-message.error {
+    background-color: #FDDFDE;
+    border-color: #FBC7C6;
+}
+.alert-message.block-message.error, .alert-message.block-message.success, .alert-message.block-message.info {
+    color: #404040;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.alert-message.block-message {
+    background-image: none;
+    box-shadow: none;
+    padding: 14px;
+}
+.btn.danger, .alert-message.danger, .btn.error, .alert-message.error {
+    background-repeat: repeat-x;
+}
+.alert-message {
+    border-radius: 4px;
+    border-style: solid;
+    border-width: 1px;
+    margin-bottom: 18px;
+    position: relative;
+}
+.alert-message.block-message.success {
+    background-color: #D1EED1;
+    border-color: #BFE7BF;
+}
+
+/************************/
+/* jquery.fileupload.css */
+/************************/
+.fileinput-button {
+position: relative;
+overflow: hidden;
+}
+.fileinput-button input {
+	position: absolute;
+	top: 0;
+	right: 0;
+	margin: 0;
+	opacity: 0;
+	-ms-filter: 'alpha(opacity=0)';
+	font-size: 200px;
+	direction: ltr;
+	cursor: pointer;
+}
+
+/* Fixes for IE < 8 */
+@media screen\9 {
+	.fileinput-button input {
+		filter: alpha(opacity=0);
+		font-size: 100%;
+		height: 100%;
+	}
+}

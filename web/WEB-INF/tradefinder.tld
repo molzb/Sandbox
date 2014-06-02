@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taglib version="2.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd">
+  <description>Tradefinder JSP Tag Library</description>
+  <tlib-version>3.0</tlib-version>
+  <short-name>tf</short-name>
+  <uri>http://tradefinder.db.com/tags/tradefinder</uri>
+  <tag>
+    <description>Tag for a standardized HTML5 enabled file upload. Date: 04/2014.</description>
+    <name>upload</name>
+    <tag-class>com.db.tradefinder.taglib.FileUpload2014Tag</tag-class>
+    <body-content>JSP</body-content>
+    <attribute>
+      <description>Maximum size of the upload in KB</description>
+      <name>maxsize</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <description>Allowed suffices - comma separated, e.g. 'csv,txt'</description>
+      <name>suffices</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <description>Id of the command, see TF_SCREENER.UPLOAD_CMD</description>
+      <name>uploadCmd</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <description>Label of the button, Default: + Add files</description>
+      <name>label</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <description>Multiple File Upload, set to true or false. Default: false</description>
+      <name>multiple</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <description>Prefix for the uploaded file to prevent overriding the same file over and over again,
+		  i.e. ${user}_${date}_
+	  </description>
+      <name>filenamePrefix</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <description>Define your own processing of the file. If not set,
+				the file will be uploaded unaltered.
+	  </description>
+      <name>javaCallback</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <description>Define your own javascript function that will be called after the file upload.
+			</description>
+      <name>javascriptCallback</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <description>Preview the uploaded files in the upload pane</description>
+      <name>preview</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+	<attribute>
+      <description>Show dropdown. Default is false.</description>
+      <name>showPermissionsInSelectTag</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+	<attribute>
+      <description>Show dropdown with upload commands. Default is false.</description>
+      <name>showUploadCmdsInSelectTag</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+
+  <tag>
+    <description>URL tag based on the JSTL c:url tag. This variant is fully
+			backwards compatible with the standard tag. Enhancements include support
+			for URL template parameters.
+		</description>
+    <name>url</name>
+    <tag-class>com.db.tradefinder.web.taglibs.TfUrlTag</tag-class>
+    <body-content>JSP</body-content>
+    <attribute>
+      <description>The URL to build. This value can include template place holders
+				that are replaced with the URL encoded value of the named parameter. Parameters
+				must be defined using the param tag inside the body of this tag.
+			</description>
+      <name>value</name>
+      <required>true</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <description>Specifies a remote application context path. The default is the
+				current application context path.
+			</description>
+      <name>context</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <description>The name of the variable to export the URL value to.</description>
+      <name>var</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <description>The scope for the var. 'application', 'session', 'request' and
+				'page' scopes are supported. Defaults to page scope. This attribute has no
+				effect unless the var attribute is also defined.
+			</description>
+      <name>scope</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <description>Set HTML escaping for this tag, as a boolean value. Overrides the
+				default HTML escaping setting for the current page.
+			</description>
+      <name>htmlEscape</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <description>Set JavaScript escaping for this tag, as a boolean value.
+				Default is false.
+			</description>
+      <name>javaScriptEscape</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+</taglib>

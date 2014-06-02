@@ -1,0 +1,63 @@
+Hi,
+
+I searched some time in Stackoverflow for tools which are able to find dead (not referenced) code 
+in large projects (JEE in my case) for all sort of files. 
+
+It should not only find dead Java code, but also dead code in every filetype that I define,
+let's say in *.jsp, *.css, *.js, *.myExtension. 
+But I didn't find anything, that goes beyond finding unused Java files - for a good reason, perhaps.
+
+Before I'm writing this on my own (in Java using Swing), I would like to ask you if there is already 
+something better than I could do it. And, if you think, this is useful, although there are some quite hard 
+restrictions on the validity of the search results, as this would be a fully text-based search. 
+
+Basically the tool should be able to scan through the project(s) and tell me:
+
+[List all CSS files in (my project, all projects, my directory]
+|___[Search for references in (JSP, XHTML, HTML, (user defined extensions)) 
+1) a.css is referenced 3 times by {b.xhtml, c.jsp, d.html}
+2) b.css is referenced 1 times by {b.xhtml}
+n) ...
+999) xyz.css is not referenced 
+
+Here you should be able to sort the results by filename, extension, path, # of references etc.
+And you could select the files and do some operations (move, delete, rename (=prefixing)) on them.
+_____________________________________________________________
+
+[List JS files in (my project, all projects, my directory]
+|___[Search for references in (JSP, XHTML, (user defined extensions)] 
+1) x.js is referenced ... etc.
+...
+444) last.js is not referenced
+_____________________________________________________________
+
+[List MyExt files in (my project, all projects, my directory]
+1) z.myExt is referenced ... etc.
+_____________________________________________________________
+
+The search for references would be fully text-based. Being text-based, there are
+some restrictions to the validity of the search results.
+For example, a search for abc.jsp would find a reference in
+a) test1.jsp: 
+*   new File("abc.jsp");
+
+but would not find any results in
+b) test2.jsp:
+    new File("ab" + c + ".jsp")
+    new File("abc." + [line break] +
+      "jsp")
+
+
+So, knowing this, I would estimate, that I have (depending on the coding style)
+about 90+% correct results and let's say 10-% wrong results. While the tool should be
+quite reliable for finding dead CSS files, it might be less reliable in finding dead 
+Java code (the user would be warned about this).
+This tool should be in no way a replacement for a "real" code coverage tool, but should 
+only give a rough estimate of which file is used where (if at all) and how often and thus 
+be an orientation to the developer or maintainer of a large project.
+
+Do you think, this would be useful? Or would the restrictions be too much for you?
+Would you stop using a tool like that after the second false positive?
+Would if be sufficient for you to use this just for an orientation?
+
+Thanks for your comments.
