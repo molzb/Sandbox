@@ -20,25 +20,23 @@ public class FileModel {
 
 	@Getter
 	@Setter
-	File me;
+	private File me;
 	@Getter
 	@Setter
-	String webFilename;
+	private String webFilename;
 	@Getter
 	@Setter
-	List<String> referencedBy = new ArrayList<String>();
+	private List<String> referencedBy = new ArrayList<String>();
 	@Getter
 	@Setter
-	List<String> references = new ArrayList<String>();
+	private List<String> references = new ArrayList<String>();
 	@Getter
 	@Setter
-	int lines;
+	private int lines;
+	@Getter
+	@Setter
+	private List<String> imports = new ArrayList<String>();	//TODO
 
-	@Override
-	public String toString() {
-		return webFilename + " (lines: " + lines + ")\n\tReferences=" + references + "\n\tReferencedBy=" + referencedBy;
-	}
-	
 	private List<String> getRefsBySuffix(String suffix) {
 		List<String> l = new ArrayList<String>();
 		for (String ref : referencedBy) {
@@ -49,13 +47,18 @@ public class FileModel {
 		return l;
 	}
 	
+	@Override
+	public String toString() {
+		return webFilename + " (lines: " + lines + ")\n\tReferences=" + references + "\n\tReferencedBy=" + referencedBy;
+	}
+
 	public String toJSON() {
 		return String.format("{ \"filename\": \"%s\", " + 
 				" \"webfilename\": \"%s\", " + 
 				" \"refByJava\": \"%s\", ", 
 				" \"refByJSP\": \"%s\", ", 
 				" \"refBySpring\": \"%s\", ", 
-				" \"refByMenu\": \"%s\", ", 
+				" \"refByMenu\": \"%s\" }, ", 
 				me.getName(), webFilename, 
 				getRefsBySuffix("java"), 
 				getRefsBySuffix("jsp").toString() + getRefsBySuffix("jspf"),
