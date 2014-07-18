@@ -10,13 +10,13 @@ import lombok.AllArgsConstructor;
  */
 @AllArgsConstructor
 public class FileUsageFilter implements FileFilter {
-
 	private final String[] filesToScan;
+	private boolean acceptDirs = true;
 
 	@Override
 	public boolean accept(File pathname) {
 		for (String suffix : filesToScan) {
-			if (pathname.isDirectory() || pathname.getName().endsWith(suffix)) {
+			if ( (pathname.isDirectory() && acceptDirs) || pathname.getName().endsWith(suffix)) {
 				return true;
 			}
 		}
