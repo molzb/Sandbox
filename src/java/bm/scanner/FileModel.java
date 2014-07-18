@@ -2,7 +2,9 @@ package bm.scanner;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -35,7 +37,7 @@ public class FileModel {
 	private int lines;
 	@Getter
 	@Setter
-	private List<String> imports = new ArrayList<String>();	//TODO
+	private Set<String> imports = new HashSet<String>();
 
 	private List<String> getRefsBySuffix(String suffix) {
 		List<String> l = new ArrayList<String>();
