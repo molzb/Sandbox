@@ -49,12 +49,21 @@
 			// The scanner should recognize, that SLF4j, Commons IO and Spring Web MVC is used
 			Logger logger = LoggerFactory.getLogger("test");	//slf4j
 			File[] f1 = FileUtils.EMPTY_FILE_ARRAY;	// Commons IO
-			HttpEntity e;	// Spring Web MVC
-			
+			HttpEntity e;	// Spring Web MVC, so don't read commons.lang.whatever
+			String s = "Don't read //comment here"; 
+			String t = "Don't read //comment here"; // but here
+			String u = "This is not a /*comment*/";
+			String v = "This is not a /*comment*/"; /* but this is */
+			/** Single line comment in code block*/
+			/*
+			 * Multiline comment in code block
+			 */
+			if(!com.db.tomcat.tfsecurity.TFSecurity.getTFUser().isPermitted("user_administration")) return;
 			new java.util.concurrent.BrokenBarrierException();
 			java.awt.Component c1d2 = new java.awt.List();
 			java.util.Set<Logger> loggers = new java.util.HashSet<>();
-			com.db.tomcat.tfsecurity.TFUser u;
+			com.db.tomcat.tfsecurity.TFUser user;
+			com.db.tradefinder.TradeFinderServlet /* com.db.dontReadThis */ tfs;	// and not that
 			// static calls
 			org.springframework.util.StringUtils.capitalize("X");
 			String tr = com.db.tradefinder.service.factory.ConnectionFactory.TRADEFINDER;
