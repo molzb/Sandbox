@@ -9,15 +9,23 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- *
+ * Generic File model
+ * @see JarFileModel
+ * @see JavaFileModel
  * @author Bernhard
  */
 public class FileModel {
 
-	FileModel(File me) {
+	public FileModel(File me) {
 		this.me = me;
-		webFilename = me.getAbsolutePath().replace(FileUsageScanner.contextRealPath, FileUsageScanner.context);
-		webFilename = webFilename.replace('\\', '/').replace("//", "/");
+		if (me.getAbsolutePath().contains(FileUsageScanner.contextRealPath)) {
+			webFilename = me.getAbsolutePath().replace(FileUsageScanner.contextRealPath, FileUsageScanner.context);
+			webFilename = webFilename.replace('\\', '/').replace("//", "/");
+			if (webFilename.startsWith("/"))
+				webFilename = webFilename.substring(1);
+		} else {
+			webFilename = "";
+		}
 	}
 
 	@Getter
@@ -28,20 +36,23 @@ public class FileModel {
 	private String webFilename;
 	@Getter
 	@Setter
-	private List<String> referencedBy = new ArrayList<String>();
+	private List<String> usedBy = new ArrayList<String>();
 	@Getter
 	@Setter
-	private List<String> references = new ArrayList<String>();
+	private List<String> uses = new ArrayList<String>();
 	@Getter
 	@Setter
 	private int lines;
 	@Getter
 	@Setter
 	private Set<String> imports = new HashSet<String>();
+	@Getter
+	@Setter
+	private boolean referencedInMenu = false;
 
 	private List<String> getRefsBySuffix(String suffix) {
 		List<String> l = new ArrayList<String>();
-		for (String ref : referencedBy) {
+		for (String ref : usedBy) {
 			if (ref.endsWith(suffix)) {
 				l.add(ref);
 			}
@@ -51,7 +62,7 @@ public class FileModel {
 	
 	@Override
 	public String toString() {
-		return webFilename + " (lines: " + lines + ")\n\tReferences=" + references + "\n\tReferencedBy=" + referencedBy;
+		return webFilename + " (lines: " + lines + ")\n\tUses=" + uses + "\n\tUsedBy=" + usedBy;
 	}
 
 	public String toJSON() {
@@ -67,4 +78,9 @@ public class FileModel {
 				getRefsBySuffix("disp"),
 				"Menu TODO");
 	}
+	
+//	String sqlCount = "SELECT COUNT(*) FROM fileusage WHERE fullFilename=?";
+//	String sqlUpdate = "UPDATE fileusage SET imports=?, usesReflection=? ";
+//	String sqlUpateOrInsert = "INSERT INTO fileusage (filename) VALUES (?)" +
+//			"  ON DUPLICATE KEY UPDATE referencedInMenu = ?";
 }

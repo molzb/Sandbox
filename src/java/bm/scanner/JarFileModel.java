@@ -1,7 +1,9 @@
 package bm.scanner;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,9 +20,15 @@ public class JarFileModel extends FileModel {
 	
 	@Getter @Setter 
 	private Set<String> packages = new HashSet<String>();
+	@Getter @Setter
+	private List<String> unidentifiableExternalReferences = new ArrayList<String>();
 	
 	@Override
 	public String toString() {
-		return super.getMe().getName() + " (Packages:\n\t" + packages + "\n\tReferencedBy=" + getReferencedBy();
+		return super.getMe().getName() +
+				"\n\tReferencedBy=" + getUsedBy() +
+				"\n\tReferences=" + getUses() +
+				"\n\tUnidentifiableReferences=" + getUnidentifiableExternalReferences() +
+				"\n\tPackages=" + getPackages();
 	}
 }
