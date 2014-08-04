@@ -87,7 +87,7 @@ public class DirWalker {
 
 class MyFileFilter implements FileFilter {
 
-	List<String> suffices = new ArrayList<String>();
+	List<String> suffices = new ArrayList<>();
 	private int level = 1;
 	
 	MyFileFilter(int level) {
