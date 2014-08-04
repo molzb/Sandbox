@@ -19,9 +19,9 @@ public class JarFileModel extends FileModel {
 	}
 	
 	@Getter @Setter 
-	private Set<String> packages = new HashSet<String>();
+	private Set<String> packages = new HashSet<>();
 	@Getter @Setter
-	private List<String> unidentifiableExternalReferences = new ArrayList<String>();
+	private List<String> unidentifiableExternalReferences = new ArrayList<>();
 	
 	@Override
 	public String toString() {
