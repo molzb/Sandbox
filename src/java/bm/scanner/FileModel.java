@@ -18,8 +18,8 @@ public class FileModel {
 
 	public FileModel(File me) {
 		this.me = me;
-		if (me.getAbsolutePath().contains(FileUsageScanner.contextRealPath)) {
-			webFilename = me.getAbsolutePath().replace(FileUsageScanner.contextRealPath, FileUsageScanner.context);
+		if (me.getAbsolutePath().contains(FileUsageScanner.CONTEXT_REALPATH)) {
+			webFilename = me.getAbsolutePath().replace(FileUsageScanner.CONTEXT_REALPATH, FileUsageScanner.CONTEXT);
 			webFilename = webFilename.replace('\\', '/').replace("//", "/");
 			if (webFilename.startsWith("/"))
 				webFilename = webFilename.substring(1);
@@ -36,22 +36,22 @@ public class FileModel {
 	private String webFilename;
 	@Getter
 	@Setter
-	private List<String> usedBy = new ArrayList<String>();
+	private List<String> usedBy = new ArrayList<>();
 	@Getter
 	@Setter
-	private List<String> uses = new ArrayList<String>();
+	private List<String> uses = new ArrayList<>();
 	@Getter
 	@Setter
 	private int lines;
 	@Getter
 	@Setter
-	private Set<String> imports = new HashSet<String>();
+	private Set<String> imports = new HashSet<>();
 	@Getter
 	@Setter
 	private boolean referencedInMenu = false;
 
 	private List<String> getRefsBySuffix(String suffix) {
-		List<String> l = new ArrayList<String>();
+		List<String> l = new ArrayList<>();
 		for (String ref : usedBy) {
 			if (ref.endsWith(suffix)) {
 				l.add(ref);
