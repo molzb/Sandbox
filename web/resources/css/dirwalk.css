@@ -1,0 +1,33 @@
+/* 
+    Created on : Aug 3, 2014, 9:56:25 PM
+    Author     : Bernhard
+*/
+
+/* tree should take entire height of the page */
+html, body, #content { height: 100%; }
+#content #details { display: inline-block; border: 1px solid #eeeeee; padding: 10px; vertical-align: top; }
+
+#searchFile { padding: 5px; height: 4%; }
+#searchFile input { width: 300px; }
+
+#tree { width: 500px; height: 96%; overflow: scroll; padding: 10px 10px 10px 20px; display: inline-block;
+		border: 1px solid #eeeeee; vertical-align: top; }
+#tree ul { padding-left: 20px; }
+/*#tree li.dir { background-image: url('images/fileUsage/expanded.png'); background-repeat: no-repeat; }*/
+#tree li.clazz:hover, #tree li.img:hover,
+#tree li.html:hover, #tree li.jar:hover, #tree li.java:hover, #tree li.js:hover,
+#tree li.jsp:hover, #tree li.jspf:hover, #tree li.sql:hover, #tree li.tld:hover,
+#tree li.txt:hover, #tree li.xml:hover { background-color: #eeeeee; }
+#tree li.dir	{ list-style-image: url('../../images/fileUsage/dir.png'); }
+#tree li.clazz	{ list-style-image: url('../../images/fileUsage/clazz.png'); }
+#tree li.img	{ list-style-image: url('../../images/fileUsage/img.png'); }
+#tree li.html	{ list-style-image: url('../../images/fileUsage/img.png'); }
+#tree li.jar	{ list-style-image: url('../../images/fileUsage/jar.png'); }
+#tree li.java	{ list-style-image: url('../../images/fileUsage/java.png'); }
+#tree li.js		{ list-style-image: url('../../images/fileUsage/js.png'); }
+#tree li.jsp	{ list-style-image: url('../../images/fileUsage/jsp.png'); }
+#tree li.jspf	{ list-style-image: url('../../images/fileUsage/jspf.png'); }
+#tree li.sql	{ list-style-image: url('../../images/fileUsage/sql.png'); }
+#tree li.tld	{ list-style-image: url('../../images/fileUsage/tld.png'); }
+#tree li.txt	{ list-style-image: url('../../images/fileUsage/txt.png'); }
+#tree li.xml	{ list-style-image: url('../../images/fileUsage/xml.png'); }
