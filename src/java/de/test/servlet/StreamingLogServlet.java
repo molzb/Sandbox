@@ -82,8 +82,15 @@ public class StreamingLogServlet extends HttpServlet {
 		HttpSession session = request.getSession(true);
 
 		File logfile = new File(logPath, logFile);
+		boolean clearParameter = ServletRequestUtils.getBooleanParameter(request, "clear", false);
 		int linesParameter = ServletRequestUtils.getIntParameter(request, "lines", 0);
 		int bytesParameter = ServletRequestUtils.getIntParameter(request, "bytes", 0);
+		
+		if (clearParameter == true) {
+			session.setAttribute("lastLine", 1);
+			return; 			
+		}
+		
 		boolean bytesDiffParameter = ServletRequestUtils.getBooleanParameter(request, "bytesDiff", false);
 		if (bytesDiffParameter) {
 			bytesParameter = getFileLenDiff(logfile, session);
