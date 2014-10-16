@@ -94,7 +94,7 @@ function markValidate() {
 
 function filter(elem) {
 	var cnt = 0;
-	if ($(elem).hasClass("error")) {
+	if ($(elem).hasClass("all")) {
 		$(".log > span").show();
 		$("#tdFilter .count").text("Show all");
 	} else if ($(elem).hasClass("error")) {
