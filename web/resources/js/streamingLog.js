@@ -15,9 +15,9 @@ $(document).ready(function() {
 			data("toggle", "tooltip").
 			data("placement", "top").
 			tooltip();
-//	$("#tdFilter .error, #tdFilter .warn, #tdFilter .info, #tdFilter .text").click(function() {
-//		$(this).toggleClass("active");
-//	});
+
+	// let's start with line 1 (not with 'lastLine' from last session)
+	$.ajax({url: "StreamingLogServlet?clear=true"});
 });
 
 var pollId = 0;

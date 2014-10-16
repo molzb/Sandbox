@@ -48,24 +48,22 @@
 									<span class="count">&nbsp;</span>
 								</td>
 								<td id="tdFilter">
-									<!--<div id="filter">-->
-										<span id="spanFilter">Filter lines: </span>
-										<div class="btn-group">
-											<button class="btn btn-default all" onclick="filter(this)" data-toggle="tooltip" 
-													data-placement="top" title="Show all lines">All</button>
-											<button class="btn btn-default error" onclick="filter(this)" data-toggle="tooltip" 
-													data-placement="top" title="Show lines with error messages">E</button>
-											<button class="btn btn-default warn"  onclick="filter(this)" data-toggle="tooltip" 
-													data-placement="top" title="Show lines with warning messages">W</button>
-											<button class="btn btn-default info"  onclick="filter(this)" data-toggle="tooltip" 
-													data-placement="top" title="Show lines with info messages">I</button>
-										</div>
-										
-										<button class="btn btn-default text"  onclick="filter(this)" data-toggle="tooltip" 
-												data-placement="top" title="Show lines with this text">T</button>
-										<input id="txtFilter" type="text" placeholder="Ex. msgFromYourClass=" value="" class="form-control"/>
-										<span class="count">&nbsp;</span>
-									<!--</div>-->
+									<span id="spanFilter">Filter lines: </span>
+									<div class="btn-group">
+										<button class="btn btn-default all" onclick="filter(this)" data-toggle="tooltip" 
+												data-placement="top" title="Show all lines">All</button>
+										<button class="btn btn-default error" onclick="filter(this)" data-toggle="tooltip" 
+												data-placement="top" title="Show lines with error messages">E</button>
+										<button class="btn btn-default warn"  onclick="filter(this)" data-toggle="tooltip" 
+												data-placement="top" title="Show lines with warning messages">W</button>
+										<button class="btn btn-default info"  onclick="filter(this)" data-toggle="tooltip" 
+												data-placement="top" title="Show lines with info messages">I</button>
+									</div>
+
+									<button class="btn btn-default text"  onclick="filter(this)" data-toggle="tooltip" 
+											data-placement="top" title="Show lines with this text">T</button>
+									<input id="txtFilter" type="text" placeholder="Ex. msgFromYourClass=" value="" class="form-control"/>
+									<span class="count">&nbsp;</span>
 								</td>
 							</tr>
 						</table>
