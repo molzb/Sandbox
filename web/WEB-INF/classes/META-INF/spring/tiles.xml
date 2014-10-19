@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE tiles-definitions
+	PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+	"http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+
+<tiles-definitions>
+	<!-- Basic Layout is naked page, containing only js and css includes, but neither header nor footer -->
+	<!-- Following tags may be used: 'css', 'js', 'js-packages', 'body-classes' -->
+	<definition name='basic' template='/WEB-INF/views/layout/index.jsp'>
+		<put-attribute name='classes'  value=''/>
+		<put-attribute name='header'   value=''/>
+		<put-attribute name='menu'     value=''/>
+		<put-attribute name='content'  value=''/>
+		<put-attribute name='footer'   value=''/>
+		<put-attribute name='toggler'  value=''/>
+	</definition>
+	<definition name='**.basic.disp' extends='basic'>
+		<put-attribute name='content'  value='/WEB-INF/views/{1}.jsp'/>
+	</definition>
+
+	<!-- Standalone Layout is for popup pages that doesn't contain menu -->
+	<definition name='standalone' extends='basic'>
+		<put-attribute name='header'   value='/WEB-INF/views/layout/header.jsp'/>
+		<put-attribute name='footer'   value='/WEB-INF/views/layout/footer.jsp'/>
+	</definition>
+	<definition name='**.standalone.disp' extends='standalone'>
+		<put-attribute name='content'  value='/WEB-INF/views/{1}.jsp'/>
+	</definition>
+
+	<!-- Content Layout should be used for most pages -->
+	<definition name='content' extends='standalone'>
+		<put-attribute name='menu'     value='/WEB-INF/views/layout/menu-universal.jsp'/>
+		<put-attribute name='breadcr'  value='/WEB-INF/views/layout/breadcrumbs.jsp'/>
+		<put-attribute name='toggler'  value='/WEB-INF/views/layout/toggler.jsp'/>
+	</definition>
+	<definition name='**.content.disp' extends='content'>
+		<put-attribute name='content'  value='/WEB-INF/views/{1}.jsp'/>
+	</definition>
+
+	<!-- Visual Layout is abstract layout for pages with image background under the menu -->
+	<!-- Following tags may be used: 'visual' -->
+	<definition name='visual' extends='content'>
+		<put-attribute name='toggler'  value=''/>
+	</definition>
+
+	<!-- Home Layout is for pages with big visuals and no breadcrumbs -->
+	<definition name='**.home.disp' extends='visual'>
+		<put-attribute name='classes'  value='home'/>
+		<put-attribute name='content'  value='/WEB-INF/views/{1}.jsp'/>
+		<put-attribute name='breadcr'  value=''/>
+	</definition>
+
+	<!-- Overview Layout is for pages with small visuals and breadcrumbs -->
+	<!-- There may be two content areas: normal content below breadcrumbs and visual content between menu and breadcrumbs -->
+	<definition name='**.overview.disp' extends='visual'>
+		<put-attribute name='classes'  value='overview'/>
+		<put-attribute name='content'  value='/WEB-INF/views/{1}.jsp'/>
+	</definition>
+</tiles-definitions>

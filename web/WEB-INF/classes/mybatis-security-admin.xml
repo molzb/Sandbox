@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "">
+
+<mapper namespace="com.db.tradefinder.persistence.permissions.PermissionsAdminPM">
+    <select id="com.db.tradefinder.persistence.permissions.PermissionsAdminPM.searchUsers" parameterType="map"
+            resultType="string"><![CDATA[
+		select
+		    users.username
+        from
+            tf_tradefinder_users users
+        where
+            users.username like #{search}]]>
+    </select>
+    <select id="com.db.tradefinder.persistence.permissions.PermissionsAdminPM.loadUser" parameterType="map"
+            resultType="com.db.tradefinder.service.ajax.security.admin.UserDto"><![CDATA[
+        select
+            users.username,
+            users.locked,
+            users.LOCK_REASON lockUnlockReason
+        from
+            tf_tradefinder_users users
+        where
+            users.username = #{username}]]>
+    </select>
+    <update id="com.db.tradefinder.persistence.permissions.PermissionsAdminPM.unlockUser" parameterType="map"><![CDATA[
+        update
+            tf_tradefinder_users users
+        set
+            users.locked = null,
+            users.LOCK_REASON = #{reason},
+            users.FAILED_LOGINS = 0
+        where
+            users.username = #{username}]]>
+    </update>
+    <update id="com.db.tradefinder.persistence.permissions.PermissionsAdminPM.lockUser" parameterType="map"><![CDATA[
+        update
+            tf_tradefinder_users users
+        set
+            users.locked = 'Y',
+            users.LOCK_REASON = #{reason}
+        where
+            users.username = #{username}]]>
+    </update>
+    <select id="com.db.tradefinder.persistence.permissions.PermissionsAdminPM.auditLog" parameterType="map"
+            resultType="com.db.tradefinder.service.ajax.security.admin.AuditLog"><![CDATA[
+        select
+            operator,
+            time,
+            operation
+        from
+            manage_owner.auditlog al
+        where
+            al.time > #{startDate}
+        order by
+            al.time desc]]>
+    </select>
+    <select id="com.db.tradefinder.persistence.permissions.PermissionsAdminPM.fileScreenerRoots" parameterType="map"
+            resultType="string"><![CDATA[
+        select
+            distinct(fs.root)
+        from
+            tradefinder_owner.file_screener fs]]>
+    </select>
+    <select id="com.db.tradefinder.persistence.permissions.PermissionsAdminPM.cmdScreenerNamespaces" parameterType="map"
+            resultType="com.db.tradefinder.service.ajax.security.admin.CmdScreener"><![CDATA[
+        select
+            distinct(cs.namespace) namespace
+        from
+            tradefinder_owner.cmd_screener cs
+        where
+            cs.namespace is not null
+        order by
+            cs.namespace]]>
+    </select>
+    <insert id="com.db.tradefinder.persistence.permissions.PermissionsAdminPM.createCmdScreener" parameterType="map"><![CDATA[
+        insert into
+            tradefinder_owner.cmd_screener(namespace, cmd, permission)
+        values(#{namespace, jdbcType=VARCHAR}, #{cmd, jdbcType=VARCHAR}, #{permission})]]>
+    </insert>
+    <update id="com.db.tradefinder.persistence.permissions.PermissionsAdminPM.saveCmdScreener" parameterType="map">
+        update
+            tradefinder_owner.cmd_screener cs
+        set
+            cs.namespace = #{newNamespace},
+            cs.cmd = #{newCmd, jdbcType=VARCHAR},
+            cs.permission = #{permission}
+        where
+        <if test="namespace != null">
+            cs.namespace = #{namespace}
+        </if>
+        <if test="namespace == null">
+            cs.namespace is null
+        </if>
+        and
+        <if test="cmd != null">
+            cs.cmd = #{cmd}
+        </if>
+        <if test="cmd == null">
+            cs.cmd is null
+        </if>
+    </update>
+    <select id="com.db.tradefinder.persistence.permissions.PermissionsAdminPM.cmdScreenerCmds" parameterType="map"
+            resultType="com.db.tradefinder.service.ajax.security.admin.CmdScreener">
+        select
+            cs.namespace namespace,
+            cs.cmd cmd,
+            cs.permission permission
+        from
+            tradefinder_owner.cmd_screener cs
+        where
+        <if test="namespace != null">
+            cs.namespace = #{namespace}
+        </if>
+        <if test="namespace == null">
+            cs.namespace is null
+        </if>
+        order by
+            cs.cmd
+    </select>
+    <select id="com.db.tradefinder.persistence.permissions.PermissionsAdminPM.cmdScreener" parameterType="map"
+            resultType="com.db.tradefinder.service.ajax.security.admin.CmdScreener">
+        select
+            cs.namespace namespace,
+            cs.cmd cmd,
+            cs.permission permission
+        from
+            tradefinder_owner.cmd_screener cs
+        where
+        <if test="namespace != null">
+            cs.namespace = #{namespace}
+        </if>
+        <if test="namespace == null">
+            cs.namespace is null
+        </if>
+        and
+        <if test="cmd != null">
+            cs.cmd = #{cmd}
+        </if>
+        <if test="cmd == null">
+            cs.cmd is null
+        </if>
+    </select>
+    <delete id="com.db.tradefinder.persistence.permissions.PermissionsAdminPM.deleteCmdScreener" parameterType="map">
+        delete from
+            tradefinder_owner.cmd_screener cs
+        where
+        <if test="namespace != null">
+            cs.namespace = #{namespace}
+        </if>
+        <if test="namespace == null">
+            cs.namespace is null
+        </if>
+        and
+        <if test="cmd != null">
+            cs.cmd = #{cmd}
+        </if>
+        <if test="cmd == null">
+            cs.cmd is null
+        </if>
+    </delete>
+    <select id="com.db.tradefinder.persistence.permissions.PermissionsAdminPM.cmdScreenerCmdsByPermission" parameterType="map"
+            resultType="com.db.tradefinder.service.ajax.security.admin.CmdScreener"><![CDATA[
+        select
+            cs.namespace namespace,
+            cs.cmd cmd,
+            cs.permission permission
+        from
+            tradefinder_owner.cmd_screener cs
+        where
+            cs.permission = #{permission}
+        order by
+            cs.namespace,
+            cs.cmd]]>
+    </select>
+    <select id="com.db.tradefinder.persistence.permissions.PermissionsAdminPM.fileScreenerPatterns" parameterType="map"
+        resultType="com.db.tradefinder.service.ajax.security.admin.FileScreener"><![CDATA[
+        select
+            fs.root,
+            FS.PATTERN,
+            fs.permission,
+            FS.IS_DIRECTORY as isDirectory,
+            fs.is_file as isFile,
+            fs.is_regexp as isRegexp
+        from
+            tradefinder_owner.file_screener fs
+        where
+            fs.root=#{root}
+        group by
+            FS.ROOT,
+            fs.pattern,
+            fs.permission,
+            FS.IS_DIRECTORY,
+            fs.is_file,
+            fs.is_regexp,
+            FS.EVALUATION_ORDER
+        order by
+            FS.EVALUATION_ORDER]]>
+</select>
+        </mapper>

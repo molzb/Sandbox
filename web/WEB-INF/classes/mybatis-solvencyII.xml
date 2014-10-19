@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "">
+
+<mapper namespace="com.db.tradefinder.persistence.SolvencyIIPM">
+	<delete id="com.db.tradefinder.persistence.SolvencyIIPM.deletePortfolio"><![CDATA[
+		delete from
+			PFA_OWNER.PFA_PORTFOLIO_USERS users
+		where
+			users.PORTFOLIOID = #{portfolioId}]]>
+	</delete>
+
+	<update id="com.db.tradefinder.persistence.SolvencyIIPM.renamePortfolio"><![CDATA[
+		update
+			PFA_OWNER.PFA_PORTFOLIO_DETAILS
+		set
+			portfolio_name = #{portfolioName}
+		where
+			portfolioid = #{portfolioId}]]>
+	</update>
+
+	<update id="com.db.tradefinder.persistence.SolvencyIIPM.assignTradesToPortfolio"><![CDATA[
+		update
+			PFA_OWNER.PFA_PORTFOLIO_TRADES trades
+		set
+			trades.PORTFOLIOID = #{newPortfolioId}
+		where
+			trades.PORTFOLIOID in (#{portfolioId1}, #{portfolioId2})]]>
+	</update>
+
+	<update id="com.db.tradefinder.persistence.SolvencyIIPM.updateSecurity"><![CDATA[
+		update
+			PFA_OWNER.PFA_SDOS sdos
+		set
+			sdos.SDOS = #{tradeHandle}
+		where
+			sdos.TRADEHANDLEID = #{tradeHandleId} and
+			sdos.TRADEID = #{tradeId}]]>
+	</update>
+</mapper>

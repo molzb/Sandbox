@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+                      http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+	version="3.0">
+	<display-name>TradeFinder LOCAL-DEV</display-name>
+	<description>
+		Trade on our intelligence
+	</description>
+
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath:META-INF/spring/applicationContext.xml</param-value>
+	</context-param>
+
+	<servlet>
+		<servlet-name>springapp</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>classpath:META-INF/spring/springapp-servlet.xml</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>springapp</servlet-name>
+		<url-pattern>*.disp</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>springapp</servlet-name>
+		<url-pattern>*.action</url-pattern>
+	</servlet-mapping>
+
+	<resource-ref>
+		<res-ref-name>jdbc/tradefinder</res-ref-name>
+		<res-type>javax.sql.DataSource</res-type>
+		<res-auth>Container</res-auth>
+	</resource-ref>
+	<listener>
+		<listener-class>
+			com.db.tradefinder.persistence.MyBatisSessionFactoryListener</listener-class>
+	</listener>
+	<context-param>
+		<param-name>host</param-name>
+		<param-value>localhost</param-value>
+	</context-param>
+
+	<filter>
+		<filter-name>springOpenEntityManagerInViewFilter</filter-name>
+		<filter-class>org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter</filter-class>
+		<init-param>
+			<param-name>entityManagerFactoryBeanName</param-name>
+			<param-value>entityManagerFactory</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>springOpenEntityManagerInViewFilter</filter-name>
+		<url-pattern>*.disp</url-pattern>
+		<url-pattern>*.action</url-pattern>
+	</filter-mapping>
+
+	<filter>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<url-pattern>*.disp</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<url-pattern>*.action</url-pattern>
+	</filter-mapping>
+
+	<filter>
+		<filter-name>StingerFilter</filter-name>
+		<filter-class>org.owasp.stinger.StingerFilter</filter-class>
+		<init-param>
+			<param-name>config</param-name>
+			<param-value>stinger.xml</param-value>
+		</init-param>
+		<init-param>
+			<param-name>error-page</param-name>
+			<param-value>/jsp/error/errorRequestParam.html</param-value>
+		</init-param>
+		<init-param>
+			<param-name>reload</param-name>
+			<param-value>false</param-value>
+		</init-param>
+		<init-param>
+			<param-name>dryrunMode</param-name>
+			<param-value>false</param-value>
+		</init-param>
+		<init-param>
+			<param-name>bypassMode</param-name>
+			<param-value>false</param-value>
+		</init-param>
+		<init-param>
+			<param-name>verifyPostContentType</param-name>
+			<param-value>false</param-value>
+		</init-param>
+		<init-param>
+			<param-name>sendErrorCodeInsteadOfPage</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>printMismatchedCharacters</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>StingerFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter>
+		<filter-name>AuthEnforcer</filter-name>
+		<filter-class>com.db.util.tomcat.security.AuthEnforcer</filter-class>
+		<init-param>
+			<param-name>error_page</param-name>
+			<param-value>/jsp/error/errorAuthInvalid.html</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>AuthEnforcer</filter-name>
+		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+		<dispatcher>FORWARD</dispatcher>
+	</filter-mapping>
+
+	<filter>
+		<filter-name>TFSecurityFilter</filter-name>
+		<filter-class>com.db.tomcat.tfsecurity.TFSecurityFilter</filter-class>
+		<init-param>
+			<param-name>authorizationJndiDatabaseName</param-name>
+			<param-value>jdbc/tradefinder</param-value>
+		</init-param>
+		<init-param>
+			<param-name>enableCmdScreener</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>enableFileScreener</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>dryrun</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>trustedProxies</param-name>
+			<param-value>10.82.91.127</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>TFSecurityFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter>
+		<filter-name>MenuFilter</filter-name>
+		<filter-class>com.db.tradefinder.filter.navigation.MenuFilter</filter-class>
+		<init-param>
+			<param-name>enableNewMenuForAll</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>MenuFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<!-- Filter nur zu Testzwecken einschalten: auf DEV/UAT/PROD aktiviert -->
+	<!-- filter> <filter-name>AccessLogFilter</filter-name> <filter-class>com.db.util.tomcat.security.logging.AccessLogFilter</filter-class> 
+		</filter> <filter-mapping> <filter-name>AccessLogFilter</filter-name> <url-pattern>/*</url-pattern> 
+		</filter-mapping -->
+
+	<servlet>
+		<servlet-name>TradeFinderServlet</servlet-name>
+		<servlet-class>com.db.tradefinder.TradeFinderServlet</servlet-class>
+		<load-on-startup>5</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>TradeFinderServlet</servlet-name>
+		<url-pattern>/TradeFinderServlet</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>CmdScreenerServlet</servlet-name>
+		<servlet-class>com.db.tomcat.tfsecurity.CmdScreenerServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>CmdScreenerServlet</servlet-name>
+		<url-pattern>/CmdScreenerServlet</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>JavascriptServlet</servlet-name>
+		<servlet-class>net.jawr.web.servlet.JawrServlet</servlet-class>
+
+		<init-param>
+			<param-name>isFilterBypass</param-name>
+			<param-value>true</param-value>
+		</init-param>
+
+		<init-param>
+			<param-name>configLocation</param-name>
+			<param-value>/jawr.properties</param-value>
+		</init-param>
+		<init-param>
+			<param-name>mapping</param-name>
+			<param-value>/jsJawr/</param-value>
+		</init-param>
+		<init-param>
+			<param-name>jawr_mimetypes</param-name>
+			<param-value>/jawr_mimetypes.properties</param-value>
+		</init-param>
+
+		<load-on-startup>4</load-on-startup>
+	</servlet>
+	<servlet>
+		<servlet-name>CSSServlet</servlet-name>
+		<servlet-class>net.jawr.web.servlet.JawrServlet</servlet-class>
+
+		<init-param>
+			<param-name>isFilterBypass</param-name>
+			<param-value>true</param-value>
+		</init-param>
+
+		<init-param>
+			<param-name>configLocation</param-name>
+			<param-value>/jawr.properties</param-value>
+		</init-param>
+		<init-param>
+			<param-name>type</param-name>
+			<param-value>css</param-value>
+		</init-param>
+		<init-param>
+			<param-name>mapping</param-name>
+			<param-value>/cssJawr/</param-value>
+		</init-param>
+
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>JavascriptServlet</servlet-name>
+		<url-pattern>/jsJawr/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>CSSServlet</servlet-name>
+		<url-pattern>/cssJawr/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>TFProxyServer</servlet-name>
+		<servlet-class>com.db.tradefinder.TFProxyServer</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>TFProxyServer</servlet-name>
+		<url-pattern>/TFProxyServer</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>ExcelServlet</servlet-name>
+		<servlet-class>com.db.tradefinder.ExcelServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>ExcelServlet</servlet-name>
+		<url-pattern>/ExcelServlet</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>AjaxServlet</servlet-name>
+		<servlet-class>com.db.tradefinder.AjaxServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>AjaxServlet</servlet-name>
+		<url-pattern>/AjaxServlet</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>FileDownloadServlet</servlet-name>
+		<servlet-class>com.db.tradefinder.FileDownloadServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>FileDownloadServlet</servlet-name>
+		<url-pattern>/FileDownloadServlet</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>FopServlet</servlet-name>
+		<servlet-class>com.db.tradefinder.FopServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>FopServlet</servlet-name>
+		<url-pattern>/FopServlet</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>SaxonServlet</servlet-name>
+		<servlet-class>com.db.tradefinder.SaxonServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>SaxonServlet</servlet-name>
+		<url-pattern>/SaxonServlet</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>ImageClipboard</servlet-name>
+		<servlet-class>com.db.tradefinder.service.ajax.user.ImageClipboard</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>ImageClipboard</servlet-name>
+		<url-pattern>/ImageClipboard</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>FwdServlet</servlet-name>
+		<servlet-class>com.db.tradefinder.FwdServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>FwdServlet</servlet-name>
+		<url-pattern>/FwdServlet</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>Logout</servlet-name>
+		<servlet-class>com.db.tradefinder.Logout</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>Logout</servlet-name>
+		<url-pattern>/Logout</url-pattern>
+	</servlet-mapping>
+
+
+	<!-- Struts configuration -->
+	<!-- Standard Action Servlet Configuration (with debugging) -->
+	<servlet>
+		<servlet-name>action</servlet-name>
+		<servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
+		<init-param>
+			<param-name>application</param-name>
+			<param-value>ApplicationResources</param-value>
+		</init-param>
+		<init-param>
+			<param-name>config</param-name>
+			<param-value>/WEB-INF/struts-config.xml</param-value>
+		</init-param>
+		<init-param>
+			<param-name>debug</param-name>
+			<param-value>2</param-value>
+		</init-param>
+		<init-param>
+			<param-name>detail</param-name>
+			<param-value>2</param-value>
+		</init-param>
+		<init-param>
+			<param-name>validate</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<load-on-startup>3</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>action</servlet-name>
+		<url-pattern>*.do</url-pattern>
+	</servlet-mapping>
+
+	<session-config>
+		<tracking-mode>COOKIE</tracking-mode>
+	</session-config>
+
+	<error-page>
+		<exception-type>com.db.tomcat.tfsecurity.AuthorizationException</exception-type>
+		<location>/WEB-INF/jspf/error/jsp/authorization.jsp</location>
+	</error-page>
+</web-app>

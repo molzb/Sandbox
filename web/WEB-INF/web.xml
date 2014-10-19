@@ -16,6 +16,7 @@
 	<servlet-mapping>
 		<servlet-name>mvc-dispatcher</servlet-name>
 		<url-pattern>*.disp</url-pattern>
+		<url-pattern>*.action</url-pattern>
 	</servlet-mapping>
  
 	<context-param>

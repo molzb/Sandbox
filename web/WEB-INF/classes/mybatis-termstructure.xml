@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "">
+
+<mapper namespace="com.db.tradefinder.persistence.MarketMenuPM">
+	<select id="com.db.tradefinder.persistence.MarketMenuPM.getIssuers" parameterType="map" resultType="string">
+		select distinct issuer from bond_spec where ccy = #{market}
+		order by issuer
+	</select>
+	<select id="com.db.tradefinder.persistence.MarketMenuPM.getIssuersFromInstruments" parameterType="map" resultType="string">
+		select instrument_name from tf_instruments where menu_linked_from = #{market}
+		order by instrument_name
+	</select>
+</mapper>

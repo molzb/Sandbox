@@ -1,0 +1,53 @@
+<ehcache
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="ehcache.xsd"
+    updateCheck="false"
+    monitoring="autodetect"
+    dynamicConfig="true"
+>
+    <diskStore path="java.io.tmpdir"/>
+
+    <cache name="mis"
+        maxElementsInMemory="2048"
+        eternal="false"
+        overflowToDisk="false"
+        timeToIdleSeconds="600"
+        timeToLiveSeconds="86400"
+    />
+
+    <cache name="underlyings"
+        maxElementsInMemory="512"
+        eternal="false"
+        overflowToDisk="false"
+        timeToIdleSeconds="0"
+        timeToLiveSeconds="300"
+    />
+
+    <cache name="curves"
+        maxElementsInMemory="100"
+        eternal="false"
+        overflowToDisk="false"
+        timeToIdleSeconds="7200"
+        timeToLiveSeconds="86400"
+    /> 
+
+    <cache name="helpfiles"
+        maxElementsInMemory="100"
+        eternal="false"
+        overflowToDisk="false"
+        timeToIdleSeconds="86400"
+        timeToLiveSeconds="86400"
+    /> 
+
+    <defaultCache
+        maxElementsInMemory="2048"
+        eternal="false"
+        timeToIdleSeconds="0"
+        timeToLiveSeconds="300"
+        maxElementsOnDisk="1000"
+        diskExpiryThreadIntervalSeconds="300"
+        memoryStoreEvictionPolicy="LRU"
+    >
+        <persistence strategy="localTempSwap"/>
+    </defaultCache>
+</ehcache>

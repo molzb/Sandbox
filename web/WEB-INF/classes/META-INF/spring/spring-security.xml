@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:sec="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/security
+		http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+
+	<bean id="http403EntryPoint" class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint"/>
+
+	<bean id="tfPreAuthFilter" class="com.db.tomcat.tfsecurity.TFPreAuthFilter">
+		<property name="authenticationManager" ref="authenticationManager"/>
+	</bean>
+
+	<sec:http entry-point-ref="http403EntryPoint" use-expressions="true">
+		<sec:custom-filter position="PRE_AUTH_FILTER" ref="tfPreAuthFilter"/>
+		<sec:access-denied-handler ref="accessDeniedHandler"/>
+	</sec:http>
+
+	<bean id="accessDeniedHandler" class="org.springframework.security.web.access.AccessDeniedHandlerImpl">
+	   <property name="errorPage" value="/access-denied.disp"/>
+	</bean>
+
+	<sec:authentication-manager alias='authenticationManager'>
+		<sec:authentication-provider ref='preauthAuthProvider'/>
+	</sec:authentication-manager>
+
+	<bean id="tfUserDetailService" class="com.db.tomcat.tfsecurity.TFUserDetailService"/>
+
+	<bean id="preauthAuthProvider" class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
+	   <property name="preAuthenticatedUserDetailsService" ref="tfUserDetailService"/>
+	</bean>
+
+	<sec:global-method-security pre-post-annotations="enabled">
+		<sec:expression-handler ref="expressionHandler"/>
+	</sec:global-method-security>
+
+	<bean id="expressionHandler" class="org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler">
+		<property name="permissionEvaluator" ref="permissionEvaluator"/>
+	</bean>
+
+	<bean id="permissionEvaluator" class="com.db.tomcat.tfsecurity.TFPermissionEvaluator"/>
+</beans>

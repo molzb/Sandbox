@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "">
+
+<mapper namespace="com.db.tradefinder.persistence.navigation.TFMenuPM">
+    <select id="com.db.tradefinder.persistence.navigation.TFMenuPM.getTFMenuTree"
+            resultType="com.db.tradefinder.model.navigation.TFMenu"><![CDATA[
+		select
+			id,
+			parent_id as parentId,
+			label,
+			cmd,
+			jsp_link as jspLink,
+			doctype_for_tf2 as doctypeForTf2,
+			jsp_template as jspTemplate,
+			position,
+			level-1 as menuLevel,
+			tablet_compatible as tabletCompatible,
+			visible,
+			view_permission as viewPermission,
+			access_permission as accessPermission
+		from
+			tf_menu
+		where
+			id != 'tf_menu'
+		start with
+			id = 'tf_menu'
+		connect by
+			prior id = parent_id and id != parent_id]]>
+    </select>
+
+    <select id="com.db.tradefinder.persistence.navigation.TFMenuPM.getMenuItem"
+            resultType="com.db.tradefinder.model.navigation.TFMenu"><![CDATA[
+		select
+			id,
+			parent_id as parentId,
+			label,
+			cmd,
+			level-1 as menuLevel,
+			jsp_link as jspLink,
+			doctype_for_tf2 as doctypeForTf2,
+			jsp_template as jspTemplate,
+			position,
+			tablet_compatible as tabletCompatible,
+			visible,
+			view_permission as viewPermission,
+			access_permission as accessPermission,
+			decode(connect_by_isleaf,0,1,0) hasChildren
+		from
+			tf_menu m
+		where
+			id = #{id}
+	    start with
+			id = 'tf_menu'
+		connect by
+			prior id = parent_id and prior id <> id and id != parent_id]]>
+    </select>
+
+    <select id="com.db.tradefinder.persistence.navigation.TFMenuPM.areMenuViewPermissions" resultType="int">
+		select
+			count(0)
+		from
+			tf_menu m
+		where
+        <foreach item="permission" index="index" collection="permissions" open="" separator=" or " close="">
+            view_permission = #{permission}
+        </foreach>
+    </select>
+
+    <select id="com.db.tradefinder.persistence.navigation.TFMenuPM.getMenuItemByViewPermission" parameterType="map" resultType="string"><![CDATA[
+		select
+			id
+		from
+			tf_menu m
+		where
+			view_permission = #{permission}]]>
+    </select>
+
+    <select id="com.db.tradefinder.persistence.navigation.TFMenuPM.getRootMenuItem"
+            resultType="com.db.tradefinder.model.navigation.TFMenu"><![CDATA[
+		select
+			id,
+			parent_id as parentId,
+			label,
+			cmd,
+			jsp_link as jspLink,
+			jsp_template as jspTemplate,
+			position,
+			tablet_compatible as tabletCompatible,
+			visible,
+			view_permission as viewPermission,
+			access_permission as accessPermission,
+			(select count(1) from dual where exists (select 1 from tf_menu where parent_id = m.id)) hasChildren
+		from
+			tf_menu m
+		where
+			id = 'tf_menu']]>
+    </select>
+
+    <select id="com.db.tradefinder.persistence.navigation.TFMenuPM.getChildren"
+            resultType="com.db.tradefinder.model.navigation.TFMenu"><![CDATA[
+		select
+			id,
+			parent_id as parentId,
+			label,
+			cmd,
+			level-1 as menuLevel,
+			jsp_link as jspLink,
+			jsp_template as jspTemplate,
+			position,
+			tablet_compatible as tabletCompatible,
+			visible,
+			view_permission as viewPermission,
+			access_permission as accessPermission,
+			(select count(1) from dual where exists (select 1 from tf_menu where parent_id = m.id)) hasChildren
+		from
+			tf_menu m
+		where
+			parent_id = #{parentId} and
+			id != #{parentId}
+	    start with
+			id = 'tf_menu'
+		connect by
+			prior id = parent_id and prior id <> id and id != parent_id
+        order by
+		    position]]>
+    </select>
+
+    <update id="com.db.tradefinder.persistence.navigation.TFMenuPM.update"><![CDATA[
+		update
+			tf_menu
+		set
+			label = #{label},
+			jsp_link = #{jspLink, jdbcType=VARCHAR},
+			doctype_for_tf2 = #{doctypeForTf2, jdbcType=NUMERIC},
+			visible = #{visible},
+			position = #{position},
+			parent_id = #{parentId},
+			jsp_template = #{jspTemplate, jdbcType=VARCHAR}
+		where
+		    id=#{id}]]>
+    </update>
+
+    <update id="com.db.tradefinder.persistence.navigation.TFMenuPM.addToMoreTools"><![CDATA[
+		UPDATE tradefinder_owner.tf_menu_nav
+		   SET navigation_data =
+				  REGEXP_REPLACE (navigation_data,
+								  ';',
+								  ';${menuId};',
+								  1,
+								  1)
+		 WHERE NOT REGEXP_LIKE (navigation_data,
+								'(^${menuId};|;${menuId};|;${menuId})')]]>
+	</update>
+
+    <update id="com.db.tradefinder.persistence.navigation.TFMenuPM.removeFromMoreTools"><![CDATA[
+		UPDATE tradefinder_owner.tf_menu_nav
+		   SET navigation_data =
+				  REGEXP_REPLACE (
+					 REGEXP_REPLACE (navigation_data,
+									 '(^${menuId};|;${menuId})',
+									 ''),
+					 ';${menuId};',
+					 ';')
+		 WHERE REGEXP_LIKE (navigation_data,
+							'(^${menuId};|;${menuId};|;${menuId})')]]>
+	</update>
+
+    <update id="com.db.tradefinder.persistence.navigation.TFMenuPM.addToUsersMoreTools">
+        merge into
+            TRADEFINDER_OWNER.tf_menu_nav tgt
+            using (
+                select #{username} username, #{menuId} menuid from dual
+            ) src
+            on
+                (tgt.username = src.username)
+            WHEN MATCHED THEN
+                update set
+                    tgt.NAVIGATION_DATA = regexp_replace(
+                        tgt.navigation_data,';',';'||src.menuid||';',1,1
+                    )
+                where
+                    navigation_data not like '%'||src.menuid||'%'
+            WHEN NOT MATCHED THEN
+                INSERT
+                    (USERNAME,UPDATED_AT,NAVIGATION_DATA)
+                VALUES (
+                    src.username,
+                    sysdate,
+                    (
+                        SELECT
+                            regexp_replace(i.navigation_data,';',';'||to_clob(src.menuid)||';',1,1)
+                        FROM
+                            TRADEFINDER_OWNER.tf_menu_nav i
+                        WHERE
+                            username ='defaultnav' and
+                            i.navigation_data not like '%'||src.menuid||'%'
+                        union all
+                            SELECT
+                                i.navigation_data
+                            FROM
+                                TRADEFINDER_OWNER.tf_menu_nav i
+                            WHERE
+                                username ='defaultnav'
+                            and i.navigation_data like '%'||src.menuid||'%'
+                    )
+                )
+    </update>
+
+    <update id="com.db.tradefinder.persistence.navigation.TFMenuPM.setPermission"><![CDATA[
+		update
+			tf_menu
+		set
+			${mode}_permission = #{permission}
+		where
+		    id=#{id}]]>
+    </update>
+
+    <update id="com.db.tradefinder.persistence.navigation.TFMenuPM.copyPermission"><![CDATA[
+		update
+			tf_menu
+		set
+			${copyToMode}_permission = (
+			select
+			    ${mode}_permission
+			from
+			    tf_menu
+			where
+			    id=#{id})
+        where
+            id=#{id}]]>
+    </update>
+
+    <update id="com.db.tradefinder.persistence.navigation.TFMenuPM.unsetPermission"><![CDATA[
+		update
+			tf_menu
+		set
+			${mode}_permission = null
+		where
+		    id=#{id}]]>
+    </update>
+
+    <delete id="com.db.tradefinder.persistence.navigation.TFMenuPM.delete"><![CDATA[
+		delete from
+			tf_menu
+		where
+		    id=#{id}]]>
+    </delete>
+
+    <update id="com.db.tradefinder.persistence.navigation.TFMenuPM.reorg"><![CDATA[
+        merge into
+            tf_menu tgt
+        using (
+            select
+                row_number() over (order by position)*10 newpos,
+                id
+            from
+                tf_menu
+            where
+                parent_id = #{parentId}
+            order by
+                position
+        ) src
+        on
+            (tgt.id = src.id)
+        when
+            matched
+        then
+            update set tgt.position = src.newpos]]>
+    </update>
+
+    <insert id="com.db.tradefinder.persistence.navigation.TFMenuPM.insert"><![CDATA[
+        insert into
+            tf_menu (
+                id,
+                parent_id,
+                label,
+                position,
+                visible
+            )
+            values (
+                #{id},
+                #{parentId},
+                #{label},
+                #{position},
+                0
+            )]]>
+    </insert>
+</mapper>
