@@ -1,6 +1,5 @@
 package com.db.tradefinder.web.controller.logviewer;
 
-import de.test.servlet.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -32,7 +31,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class StreamingLogController {
 
 	private static final long serialVersionUID = 12102014L;
-	private static final Logger  logger = Logger.getLogger(StreamingLogServlet.class.getName());
+	private static final Logger  logger = Logger.getLogger(StreamingLogController.class.getName());
 
 	private final String[] SPACES = {"", "&nbsp;", "&nbsp;&nbsp;", "&nbsp;&nbsp;&nbsp;", "&nbsp;&nbsp;&nbsp;&nbsp;",
 		"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;", "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"};
