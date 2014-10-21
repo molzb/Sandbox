@@ -92,8 +92,8 @@ class MyFileFilter implements FileFilter {
 	
 	MyFileFilter(int level) {
 		this.level = level;
-		suffices.addAll(Arrays.asList(FileUsageScanner.filesToDisplay));
-		suffices.addAll(Arrays.asList(FileUsageScanner.filesToScan));
+		suffices.addAll(Arrays.asList(FileUsageScanner.FILES_TO_DISPLAY));
+		suffices.addAll(Arrays.asList(FileUsageScanner.FILES_TO_SCAN));
 	}
 	
 	public void setLevel(int level) {

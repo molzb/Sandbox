@@ -10,8 +10,6 @@ import lombok.Setter;
  */
 class JavaFileModel extends FileModel {
 	@Getter @Setter
-	private boolean usesReflection;
-	@Getter @Setter
 	private String clazzName; // fully qualified name, e.g. bm.scanner.JavaFileModel
 
 	public JavaFileModel(File file) {

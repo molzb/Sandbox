@@ -25,10 +25,8 @@ public class ConnectionFactory {
 			Context ctx = new InitialContext();
 			DataSource ds = (DataSource) ctx.lookup("java:comp/env/jdbc/tradefinder");
 			return ds.getConnection();
-		} catch (NamingException e) {
+		} catch (NamingException | SQLException e) {
 			logger.severe(e.getMessage());
-		} catch (SQLException ex) {
-			logger.severe(ex.getMessage());
 		}
 		return null;
 	}
@@ -37,9 +35,7 @@ public class ConnectionFactory {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			return DriverManager.getConnection("jdbc:mysql://localhost:3306/tradefinder_owner", "root", "root");
-		} catch (ClassNotFoundException ex) {
-			logger.severe(ex.getMessage());
-		} catch (SQLException ex) {
+		} catch (ClassNotFoundException | SQLException ex) {
 			logger.severe(ex.getMessage());
 		}
 		return null;

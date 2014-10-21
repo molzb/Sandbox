@@ -58,15 +58,16 @@ import org.xml.sax.SAXException;
 public class FileUsageScanner {
 
 	private static final Logger logger = Logger.getLogger(FileUsageScanner.class.getName());
-	final static String TF_PATH = "C:/Users/Bernhard/Documents/NetBeansProjects/Sandbox/";
-	final static String CONTEXT = "sandbox/";
-	final static String CONTEXT_REALPATH = TF_PATH + "build/web/";
-	final static String SPRING_CONFIGPATH = TF_PATH + "web/WEB-INF/classes/META-INF/spring";
-	public static final String[] filesToScan = new String[]{
+	final static String TF_PATH = "C:/Eigenes/java/TfMini/dev/";
+	final static String CONTEXT = "tradefnd/";
+	final static String CONTEXT_REALPATH = TF_PATH + "webapps/tradefnd/";
+	final static String SPRING_CONFIGPATH = TF_PATH + "webapps/tradefnd/WEB-INF/classes/META-INF/spring";
+	final static String EXTERNAL_LIB_PATH = TF_PATH + "lib/3rdparty";
+	public static final String[] FILES_TO_SCAN = new String[]{
 		".xhtml", ".html", ".htm", ".js", ".jspf", ".jsp", ".css",	// Frontend
 		".xml", ".ini", ".properties", ".tld",	// Config
 		".java", ".pl", ".sql", ".m"};	// Backend
-	public static final String[] filesToDisplay = new String[]{"jpg", "png", "gif"};
+	public static final String[] FILES_TO_DISPLAY = new String[]{"jpg", "png", "gif"};
 	private FileUsageFilter fileFilter;
 	private final List<File> files = new ArrayList<>();
 	private final List<FileModel> fileModels = new ArrayList<>();
@@ -78,8 +79,8 @@ public class FileUsageScanner {
 //	private final Pattern fqnPatternThr2 = Pattern.compile("([a-z][a-z_0-9]*\\.)*[A-Z_]($[A-Z_]|[\\w_])*");
 
 	private List<SpringMappingModel> springMappings;
-	private final List<String> javaPkgIgnoreList = Arrays.asList(new String[] {"java."});
-	private final List<String> javaPkgAcceptList = Arrays.asList(new String[] {"javax.", "org.", "com."});
+	private final List<String> JAVA_PKG_IGNORE_LIST = Arrays.asList(new String[] {"java."});
+	private final List<String> JAVA_PKG_ACCEPT_LIST = Arrays.asList(new String[] {"javax.", "org.", "com."});
 
 	private DocumentBuilder docBuilder;
 
@@ -106,7 +107,6 @@ public class FileUsageScanner {
 //		}
 
 		File rootDir = new File(TF_PATH);
-		File thirdpartyDir = new File(TF_PATH, "build/web/WEB-INF/lib");
 		/*FileUsageScanner sc = new FileUsageScanner();
 		List<String> referencedClasses = sc.readReferencedClassesInTld(new File(TF_PATH, "web/WEB-INF/tradefinder.tld"));
 		System.out.println(referencedClasses);
@@ -141,8 +141,8 @@ public class FileUsageScanner {
 		}*/
 
 		FileUsageScanner scanner = new FileUsageScanner(rootDir);
-		System.out.println(scanner.getPackagesFromJar(new File(thirdpartyDir, "spring-web-3.2.3.RELEASE.jar")).toString().replace(",", "\n"));
-		List<FileModel> jarsList = scanner.readJarsWithJarAnalyzer(thirdpartyDir);
+		System.out.println(scanner.getPackagesFromJar(new File(EXTERNAL_LIB_PATH, "spring-web-3.2.3.RELEASE.jar")).toString().replace(",", "\n"));
+		List<FileModel> jarsList = scanner.readJarsWithJarAnalyzer(new File(EXTERNAL_LIB_PATH));
 		scanner.persistFileModels(jarsList, false);
 		System.out.println("JARS:\n-----");
 		for (FileModel jar : jarsList) {
@@ -173,7 +173,7 @@ public class FileUsageScanner {
 	}
 
 	public final void scan(File rootDir) {
-		fileFilter = new FileUsageFilter(filesToScan, true);
+		fileFilter = new FileUsageFilter(FILES_TO_SCAN, true);
 		if (rootDir.isDirectory()) {
 			filterFiles(rootDir);
 		} else {
@@ -246,7 +246,7 @@ public class FileUsageScanner {
 					for (FileModel m : fileModelList) {
 						if (m instanceof JavaFileModel) {
 							String clazzname = ((JavaFileModel)m).getClazzName();
-							if (clazzname.equals(beanDefinition.getBeanClassName())) {
+							if (beanDefinition.getBeanClassName().equals(clazzname)) {
 								if (!springMappingModel.getUrlMappings().isEmpty()) {
 									String urlMappings = springMappingModel.getUrlMappings().toString();
 									m.setWebFilename(urlMappings.substring(1, urlMappings.length()-1));
@@ -306,7 +306,7 @@ public class FileUsageScanner {
 	}
 
 	private void printFileCountBySuffix() {
-		for (String suffix : filesToScan) {
+		for (String suffix : FILES_TO_SCAN) {
 			int fileCount = 0;
 			for (File file : files) {
 				if (file.getName().endsWith(suffix)) {
@@ -473,12 +473,22 @@ public class FileUsageScanner {
 		//JSP: <%@page import="java.util.Date"%><%@page import="java.util.Date, java.sql.SQLException"%>
 		boolean isJsp = filename.endsWith(".jsp") || filename.endsWith(".jspf");
 		boolean isJava = filename.endsWith(".java");
+		
+		boolean multilineImport = false;
 		for (String line : lines) {
 			line = line.trim();
 			if (isJsp) {
-				if (line.startsWith("<%") && line.contains("page") && line.contains("import=")) {
-					int iStart = line.indexOf("import=") + 8;
+				if (line.startsWith("<%") && line.contains("page") && line.contains("import=") || multilineImport) {
+					int iStart = multilineImport ? 0 : line.indexOf("import=") + 8;
 					int iEnd = line.indexOf("\"", iStart + 1);
+					if (line.endsWith(",")) {
+						// Multiline import, e.g. <%@page import="java.util.List, \n java.util.ArrayList, \n java.x.Y"%>
+						multilineImport = true;
+						iEnd = line.indexOf(",", iStart + 1);
+					} else if (line.contains("%>")) {
+						iEnd = line.indexOf("%>");
+						multilineImport = false;
+					}
 					String myImport = line.substring(iStart, iEnd);
 					myImport = myImport.replace(" ", "");	//java.x.A, java.x.B -> java.x.A,java.x.B
 					String[] importsInLine = myImport.split(",");
@@ -529,7 +539,7 @@ public class FileUsageScanner {
 				}
 				String fqClassname = matcher.group();
 				// add classname, if not in blacklist AND in whitelist
-				if (!inPackageList(fqClassname, javaPkgIgnoreList) && inPackageList(fqClassname, javaPkgAcceptList) ) {
+				if (!inPackageList(fqClassname, JAVA_PKG_IGNORE_LIST) && inPackageList(fqClassname, JAVA_PKG_ACCEPT_LIST) ) {
 					if (fqClassname.endsWith("(") || fqClassname.endsWith("<") || fqClassname.endsWith(" ")) {
 						fqClassname = fqClassname.substring(0, fqClassname.length() - 1);
 					}
@@ -565,16 +575,19 @@ public class FileUsageScanner {
 		List<String> lines = FileUtils.readLines(file, "UTF-8");
 
 		if (suffix.equals("js") || suffix.contains("jsp") || suffix.equals("java")) {
-			lines = removeLinesWithoutJavaCode(lines, file.getName());
+			if (suffix.contains("jsp")) {
+				filename += "";
+			}
+			lines = removeLinesWithoutJavaCode(lines, filename);
 		}
 
-		if (suffix.equals("java") || suffix.contains(".jsp")) {
+		if (suffix.equals("java") || suffix.contains("jsp")) {
 			fileModel = new JavaFileModel(file);
 		} else {
 			fileModel = new FileModel(file);
 		}
 		fileModel.setLines(lines.size());
-
+		
 		if (suffix.equals("css")) {
 			for (String line : lines) {
 				line = line.trim();
@@ -594,7 +607,9 @@ public class FileUsageScanner {
 			Set<String> imports = readImportsFromJavaAndJsp(filename, lines);
 			fileModel.setImports(imports);
 			if (imports.contains("java.lang.reflect")) {
-				((JavaFileModel) fileModel).setUsesReflection(true);
+				if (fileModel instanceof JavaFileModel) {
+					fileModel.setUsesReflection(true);
+				}
 			}
 		}
 
@@ -602,19 +617,21 @@ public class FileUsageScanner {
 			line = line.trim();
 			String lastSuffix = "";
 			boolean lastSuffixFound = false;
-			for (String suffi : filesToScan) {
-				if (lastSuffix.contains(suffi) && lastSuffixFound) {
+			
+			if (fileModel instanceof JavaFileModel) {
+				if (line.startsWith("package")) {
+					String myPackage = line.substring(8, line.length() - 1);
+					String filenameWithoutDotJava = filename.substring(0, filename.indexOf(".java"));
+					((JavaFileModel) fileModel).setClazzName(myPackage + "." + filenameWithoutDotJava);
+				}
+			}
+			
+			for (String suffi : FILES_TO_SCAN) {
+				if (filename.endsWith(".java")) {
 					continue;
 				}
-				if (fileModel.getMe().getName().contains("FileUsageScanner")) {
-					line = line + "";
-				}
-				if (fileModel instanceof JavaFileModel) {
-					if (line.startsWith("package")) {
-						String myPackage = line.substring(8, line.length() - 1);
-						String filenameWithoutDotJava = filename.substring(0, filename.indexOf(".java"));
-						((JavaFileModel)fileModel).setClazzName(myPackage + "." + filenameWithoutDotJava);
-					}
+				if (lastSuffix.contains(suffi) && lastSuffixFound) {
+					continue;
 				}
 				if (line.contains(suffi)) {
 					String reference = extractFilenameFromLine(line, suffi);
@@ -678,6 +695,8 @@ public class FileUsageScanner {
 	}
 
 	private String extractFilenameFromLine(String line, String suffix) {
+		if (line.contains("import ") || line.contains("page import="))
+			return null;
 		char[] delimiters = new char[]{'\"', '\'', ',', ';'};
 		line = line.trim();
 		int posFilename = line.indexOf(suffix);
@@ -705,18 +724,18 @@ public class FileUsageScanner {
 		}
 		List<String> filteredLines = new ArrayList<>();
 		boolean isJsp = suffix.contains("jsp");
-		if (filename.equals("AdminUsers.jsp")) {
-			filename = filename + "";
-		}
 		// Lines to keep in JSP(f):
-		// <%@page import="org.springframework.http.HttpEntity"%>
+		// <%@page import="org.springframework.http.HttpEntity"%> and multiline imports
 		// <% ... everything, but comments %>
 		// <jsp:useBean
 		// <%@  include file
 		// <jsp:include
 		// <% java.code %>
+		boolean multilineImportJsp = false;
 		for (int i = 0; i < lines.size(); i++) {
 			String line = removeInlineComment(lines.get(i).trim());
+			if (line.isEmpty())
+				continue;
 			// start remove comment
 			if (line.startsWith("/*") || (isJsp && line.startsWith("<%--"))) {
 				for (; i < lines.size(); i++) {
@@ -728,9 +747,17 @@ public class FileUsageScanner {
 			} // end remove comment
 			else if (!isJsp && !line.isEmpty()) {
 				filteredLines.add(line);
+			} else if (multilineImportJsp) {
+				filteredLines.add(line);
+				if (line.endsWith("%>")) {
+					multilineImportJsp = false;
+				}
 			} else if (line.startsWith("<%") && line.contains("import=")) {
 				// <%@page import="org.springframework.http.HttpEntity"%>
 				filteredLines.add(line);
+				if (line.endsWith(",")) {
+					multilineImportJsp = true;
+				}
 			} else if (line.startsWith("<jsp:useBean")) {
 				filteredLines.add(line);
 			} else if (line.startsWith("<%@") && line.contains("include") && line.contains("file=")) {
@@ -763,20 +790,12 @@ public class FileUsageScanner {
 				}
 			}
 		}	// not empty
-		if (filename.equals("AdminUsers.jsp")) {
-			for (String line : filteredLines) {
-				System.out.println(line);
-			}
-		}
 		return filteredLines;
 	}
 
 	private String removeInlineComment(String line) {
 		line = line.trim();
 		if (line.startsWith("/*") && line.endsWith("*/")) {
-			return "";
-		}
-		if (line.startsWith("<%@") && line.endsWith("%>")) {
 			return "";
 		}
 		if (line.startsWith("<%--") && line.endsWith("--%>")) {
@@ -821,10 +840,10 @@ public class FileUsageScanner {
 				logger.info("Deleted " + deleteCount + " fileusage objects in the database");
 			}
 
-			if (!(fileModels.get(0) instanceof JarFileModel)) {
-				stmtInsert = prepareInsert(conn, stmtInsert, fileModels);
-			} else {
+			if (fileModels.get(0) instanceof JarFileModel) {
 				stmtInsert = prepareInsertJar(conn, stmtInsert, fileModels);
+			} else {
+				stmtInsert = prepareInsert(conn, stmtInsert, fileModels);
 			}
 			stmtInsert.executeBatch();
 			conn.commit();
@@ -845,6 +864,7 @@ public class FileUsageScanner {
 
 		for (FileModel model : fileModels) {
 			boolean isJava = model instanceof JavaFileModel;
+			@SuppressWarnings("null")
 			String imports = model.getImports().toString();
 			String uses = model.getUses().toString();
 			String usedBy = model.getUsedBy().toString();
@@ -858,6 +878,7 @@ public class FileUsageScanner {
 			stmtInsert.setString(7, uses.substring(1, uses.length()-1));
 			stmtInsert.setString(8, usedBy.substring(1, usedBy.length()-1));
 			stmtInsert.setString(9, isJava ? ((JavaFileModel)model).getClazzName() : "");
+			System.out.println("persisting " + model);
 
 			stmtInsert.addBatch();
 		}
@@ -877,6 +898,8 @@ public class FileUsageScanner {
 			packages = packages.substring(1, packages.length()-1);
 			String unpackages = model.getUnidentifiableExternalReferences().toString();
 			unpackages = unpackages.equals("[]") ? "" : unpackages.substring(1, unpackages.length()-1);
+			
+			System.out.println("JAR " + model.getMe().getName() + "\n\tpackages=" + packages + "\n\tunpackages=" + unpackages);
 			stmtInsert.setString(1, model.getMe().getName());
 			stmtInsert.setString(2, model.getMe().getAbsolutePath());
 			stmtInsert.setString(3, packages);

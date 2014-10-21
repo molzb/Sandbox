@@ -18,8 +18,9 @@ public class FileModel {
 
 	public FileModel(File me) {
 		this.me = me;
-		if (me.getAbsolutePath().contains(FileUsageScanner.CONTEXT_REALPATH)) {
-			webFilename = me.getAbsolutePath().replace(FileUsageScanner.CONTEXT_REALPATH, FileUsageScanner.CONTEXT);
+		File contextRealpath = new File(FileUsageScanner.CONTEXT_REALPATH);
+		if (me.getAbsolutePath().contains(contextRealpath.getPath()) && !me.getAbsolutePath().contains("WEB-INF")) {
+			webFilename = me.getAbsolutePath().replace(contextRealpath.getPath(), FileUsageScanner.CONTEXT);
 			webFilename = webFilename.replace('\\', '/').replace("//", "/");
 			if (webFilename.startsWith("/"))
 				webFilename = webFilename.substring(1);
@@ -49,6 +50,9 @@ public class FileModel {
 	@Getter
 	@Setter
 	private boolean referencedInMenu = false;
+	@Getter
+	@Setter
+	private boolean usesReflection = false;
 
 	private List<String> getRefsBySuffix(String suffix) {
 		List<String> l = new ArrayList<>();
