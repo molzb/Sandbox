@@ -1,5 +1,5 @@
 /* 
- * Functions for StreamingLogServlet
+ * Functions for StreamingLog.disp
  * @Author Bernhard
  */
 "use strict";
@@ -17,13 +17,14 @@ $(document).ready(function() {
 			tooltip();
 
 	// let's start with line 1 (not with 'lastLine' from last session)
-	$.ajax({url: "StreamingLogServlet?clear=true"});
+	$.ajax({url: "StreamingLog.disp?clear=true"});
 });
 
 var pollId = 0;
+var logInfoId = 0;
 
 function updateLog() {
-	$.ajax({url: "StreamingLogServlet?lines=" + $("#txtLines").val()}).success(function(html) {
+	$.ajax({url: "StreamingLog.disp?lines=" + $("#txtLines").val()}).success(function(html) {
 		$(".log").html(html);
 		pollLog();
 		$("#btnUpdateLog").attr("disabled", true);
@@ -31,26 +32,43 @@ function updateLog() {
 	});
 }
 
+function updateLogInfo() {
+	$.ajax({url: "StreamingLogInfo.disp", dataType: "json", cache: false}).success(function(json) {
+		var txt = "Len: " + json.len + ", Diff: " + json.diff + ", " + json.time;
+		console.log("Text=" + txt);
+		$("#logInfo").text(txt);
+	}).fail(function(xhr, textStatus) {
+		console.log(textStatus);
+	});
+}
+
 function pollLog() {
 	var interval = $("#txtPollInterval").val() * 1000;
 	pollId = window.setInterval(function() {
-		$.ajax({url: "StreamingLogServlet?bytesDiff=true", cache: false}).success(function(html) {
+		$.ajax({url: "StreamingLog.disp?bytesDiff=true", cache: false}).success(function(html) {
 			$(".log").append(html);
 			var tbl = $(".log")[0];
 			tbl.scrollTop = tbl.scrollHeight;
 		});
 	}, interval);
+	logInfoId = window.setInterval(function() {
+		updateLogInfo();
+	}, interval * 5);
+	$("#logInfo").removeClass("error");
 }
 
 function pauseLog() {
 	if (pollId > 0)
 		window.clearInterval(pollId);
+	if (logInfoId > 0)
+		window.clearInterval(logInfoId);
 	$("#btnPauseLog").attr("disabled", true);
 	$("#btnUpdateLog").attr("disabled", false);
+	$("#logInfo").addClass("error").text("Paused ...");
 }
 
 function clearLog() {
-	$.ajax({url: "StreamingLogServlet?clear=true"});
+	$.ajax({url: "StreamingLog.disp?clearParameter=true"});
 	$(".log").empty();
 }
 

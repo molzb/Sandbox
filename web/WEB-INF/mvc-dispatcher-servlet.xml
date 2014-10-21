@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:mvc="http://www.springframework.org/schema/mvc" 
 	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	   xmlns:context="http://www.springframework.org/schema/context"
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans 
-	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/mvc
+	http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
 	http://www.springframework.org/schema/context
-	http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+	http://www.springframework.org/schema/context/spring-context.xsd">
  
 	<context:component-scan base-package="com.db.tradefinder.histsim.web" />
 	<context:component-scan base-package="com.db.tradefinder.web.controller.upload" />
-        <context:component-scan base-package="com.db.tradefinder.web.controller.batchUser" />
+	<context:component-scan base-package="com.db.tradefinder.web.controller.batchUser" />
+	<context:component-scan base-package="com.db.tradefinder.web.controller.logviewer" />
  
 	<bean id="viewResolver"
 		  class="org.springframework.web.servlet.view.InternalResourceViewResolver" >
@@ -20,4 +24,6 @@
 			<value>.jsp</value>
 		</property>
 	</bean>
+	
+	<mvc:annotation-driven />
 </beans>

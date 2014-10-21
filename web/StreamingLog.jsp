@@ -38,6 +38,9 @@
 									<span id="spanPoll">Poll: every </span>
 									<input id="txtPollInterval" type="text" value="1" class="form-control"/>s
 								</td>
+								<td id="logInfo">
+									&nbsp;
+								</td>
 							</tr>
 							<tr>
 								<td id="tdMark">
@@ -47,7 +50,7 @@
 									<button id="btnMarkRegex" class="btn btn-info" onclick="markRegex()" title="Search for Regex">Regex</button>
 									<span class="count">&nbsp;</span>
 								</td>
-								<td id="tdFilter">
+								<td id="tdFilter" colspan="2">
 									<span id="spanFilter">Filter lines: </span>
 									<div class="btn-group">
 										<button class="btn btn-default all" onclick="filter(this)" data-toggle="tooltip" 
