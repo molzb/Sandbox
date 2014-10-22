@@ -6,9 +6,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
- * Servlet implementation class StreamingLogServlet
+ * Spring Controller for StreamingLog.jsp
  */
 @Controller
 public class StreamingLogController {
@@ -38,22 +36,39 @@ public class StreamingLogController {
 	private final String _SPAN = "<span>", SPAN_ = "</span>";
 	private final SimpleDateFormat SDF_TIME = new SimpleDateFormat("HH:mm:ss", Locale.ENGLISH);
 //	String logPath = "C:/Users/molzber/AppData/Local/";
-//	String logFile = ""tomcat_base.log"";
-	private String logPath = "C:/xampp/tomcat/logs/";
-	private String logFile = "catalina.2014-10-15.log";
+	private String logPath = "/xampp/tomcat/logs/";
+	private String logFile = "tomcat_base.log";
 	private final int MAX_FILELEN_DIFF = 10000;
 	private final String LOGINFO_JSON = "{\"len\": \"%s\", \"diff\": \"%s\", \"time\": \"%s\"}";
+	private String textToBeMarked = "com.db.tradefinder";
 	
 	Thread writeLogThread;
 	
 	@Autowired
 	HttpSession session;
 	
-	public static void main(String[] args) {
-		GregorianCalendar gc = new GregorianCalendar(2014, 2, 30);
-		System.out.println("gc=" + gc.getTime());
-		gc.roll(Calendar.MONTH, -1);
-		System.out.println("gc=" + gc.getTime());
+	public void setSession(HttpSession session) {
+		this.session = session;
+	}
+	
+	/**
+	 * get indices of work. E.g. 'hello World', 'he' -> {0,4} 
+	 * @param str String to be searched, e.g. hello 12345 world
+	 * @param word word to be indexed, e.g. 123
+	 * @return first and last index of the word inside the string, e.g. 
+	 */
+	public int[] wordIndexOf(String str, String word) {
+		int idx = str.indexOf(word);
+		if (idx == -1)
+			return new int[] {-1, -1};
+		int idxEnd = 0;
+		for (idxEnd = idx+1; idxEnd < str.length(); idxEnd++) {
+			char c = str.charAt(idxEnd);
+			if (c == '.' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
+				continue;
+			break;
+		}
+		return new int[] {idx, idxEnd};
 	}
 	
 	private void testLogWriteThread() {
@@ -64,17 +79,26 @@ public class StreamingLogController {
 			@Override
 			public void run() {
 				while (true) {
-					int rnd = (int)(Math.random() * 3.0);
+					int rnd = (int)(Math.random() * 4.0);
 					switch (rnd) {
 						case 0: logger.info(new Date().toString()); break;
 						case 1: logger.warn(new Date().toString()); break;
 						case 2: logger.error(new Date().toString()); break;
+						case 3: throwTestException("TestException at " + SDF_TIME);
 					}
 					try { Thread.sleep(3000); } catch (Exception e) {}
 				}
 			}
 		};
 		writeLogThread.start();
+	}
+	
+	private void throwTestException(String s) {
+		try {
+			throw new MyException(s);
+		} catch (Exception e) {
+			logger.error(s);
+		}
 	}
 
 	private String getSpaces(int numGreater0, int length) {
@@ -177,6 +201,11 @@ public class StreamingLogController {
 				String start = line.substring(0, idx);
 				line = start + "<span class='info'>INFO</span>" + line.substring(idx + 4);
 			}
+			if (line.contains(textToBeMarked)) {
+				int[] startEnd = wordIndexOf(line, textToBeMarked);
+				String start = line.substring(0, startEnd[0]);
+				line = start + "<b>" + line.substring(startEnd[0], startEnd[1]) + "</b>" + line.substring(startEnd[1] + 1);
+			}
 			sbFormatted.append(_SPAN).append(getSpaces(lineNumber, 5) + lineNumber + " | ");
 			sbFormatted.append(line).append(BR).append(SPAN_);
 			lineNumber++;
@@ -272,5 +301,11 @@ public class StreamingLogController {
 
 	public void setLogFile(String logFile) {
 		this.logFile = logFile;
+	}
+}
+
+class MyException extends RuntimeException {
+	MyException(String s) {
+		super(s);
 	}
 }
