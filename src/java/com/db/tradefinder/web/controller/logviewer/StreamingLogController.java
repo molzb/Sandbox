@@ -41,28 +41,24 @@ public class StreamingLogController {
 	private final int MAX_FILELEN_DIFF = 10000;
 	private final String LOGINFO_JSON = "{\"len\": \"%s\", \"diff\": \"%s\", \"time\": \"%s\"}";
 	private String textToBeMarked = "com.db.tradefinder";
-	
+
 	Thread writeLogThread;
-	
+
 	@Autowired
 	HttpSession session;
-	
-	public void setSession(HttpSession session) {
-		this.session = session;
-	}
-	
+
 	/**
-	 * get indices of work. E.g. 'hello World', 'he' -> {0,4} 
+	 * get indices of work. E.g. 'hello World', 'he' -> {0,4}
 	 * @param str String to be searched, e.g. hello 12345 world
 	 * @param word word to be indexed, e.g. 123
-	 * @return first and last index of the word inside the string, e.g. 
+	 * @return first and last index of the word inside the string, e.g.
 	 */
 	public int[] wordIndexOf(String str, String word) {
 		int idx = str.indexOf(word);
 		if (idx == -1)
 			return new int[] {-1, -1};
-		int idxEnd = 0;
-		for (idxEnd = idx+1; idxEnd < str.length(); idxEnd++) {
+		int idxEnd = idx + 1;
+		for (; idxEnd < str.length(); idxEnd++) {
 			char c = str.charAt(idxEnd);
 			if (c == '.' || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
 				continue;
@@ -70,13 +66,16 @@ public class StreamingLogController {
 		}
 		return new int[] {idx, idxEnd};
 	}
-	
+
+	@SuppressWarnings("deprecation")
 	private void testLogWriteThread() {
-		if (writeLogThread != null && writeLogThread.isAlive()) 
+		if (writeLogThread != null && writeLogThread.isAlive()) {
 			writeLogThread.stop();
-		
+		}
+
 		writeLogThread = new Thread() {
 			@Override
+			@SuppressWarnings("SleepWhileInLoop")
 			public void run() {
 				while (true) {
 					int rnd = (int)(Math.random() * 4.0);
@@ -92,7 +91,7 @@ public class StreamingLogController {
 		};
 		writeLogThread.start();
 	}
-	
+
 	private void throwTestException(String s) {
 		try {
 			throw new MyException(s);
@@ -108,33 +107,31 @@ public class StreamingLogController {
 
 	@RequestMapping(value = "StreamingLog.disp", produces="text/html;charset=UTF-8")
 	@ResponseBody
-	protected String getStreamingLog(HttpServletRequest request, HttpServletResponse response, 
-			@RequestParam(defaultValue = "false") boolean clear, 
+	protected String getStreamingLog(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam(defaultValue = "false") boolean clear,
 			@RequestParam(defaultValue = "0") int lines,
 			@RequestParam(defaultValue = "0") int bytes,
 			@RequestParam(defaultValue = "false") boolean bytesDiff) throws IOException {
 		logger.debug("doGet " + request.getParameterMap());
-		
+
 		testLogWriteThread();
-		
+
 		File logfile = new File(logPath, logFile);
-		
+
 		if (clear == true) {
 			session.setAttribute("lastLine", 1);
-			return ""; 			
+			return "";
 		}
-		
+
 		if (bytesDiff) {
-			bytes = getFileLenDiff(logfile, session);
-			if (bytes == 0) {
-				logger.warn("FileLenDiff = 0. That means, that there are no file len changes compared to the last time");
-			}
+			//TODO bytesDiff
+			bytes = 1;
 		}
-		
+
 		int lastLineParameter = session.getAttribute("lastLine") != null
 				? (Integer) session.getAttribute("lastLine")
 				: ServletRequestUtils.getIntParameter(request, "lastLine", 1);
-		
+
 		if (lines > 0 && bytes > 0)
 			throw new IllegalArgumentException("The request parameter 'bytes', 'lines' cannot BOTH be greater 0. " +
 					"You can EITHER read a number of bytes OR a number of lines.");
@@ -149,10 +146,10 @@ public class StreamingLogController {
 		} else if (bytes > 0) {
 			log = tailBytes(logfile, session, bytes);
 		}
-		
+
 		return postProcessLog(log, lastLineParameter, session);
 	}
-	
+
 	@RequestMapping(value = "StreamingLogInfo.disp", produces = "application/json")
 	@ResponseBody
 	public String getStreamingLogInfo() {
@@ -166,16 +163,14 @@ public class StreamingLogController {
 		if (lastLogInfoLen == null || lastLogInfoLen == 0L) {
 			lastLogInfoLen = actualLength;
 		}
-		long actualLengthKB = actualLength / 1024L;
-		System.out.println("actualLength=" + actualLength + ", lenKB=" + actualLengthKB);
 		long diff = actualLength - lastLogInfoLen;
 		String dateStr = SDF_TIME.format(new Date());
 		session.setAttribute("lastLogInfoLen", actualLength);
-		return String.format(LOGINFO_JSON, actualLengthKB + "KB", diff + "B", dateStr);
+		return String.format(LOGINFO_JSON, humanReadableByteCount(actualLength), humanReadableByteCount(diff), dateStr);
 	}
-	
+
 	public String postProcessLog(String log, int lineNumber, HttpSession session) {
-		if (log == null) 
+		if (log == null)
 			return "";
 		String[] lines = log.split("\\n"); // System.getProperty("line.separator"));
 		logger.info("postProcess " + lines.length + " lines");
@@ -210,25 +205,11 @@ public class StreamingLogController {
 			sbFormatted.append(line).append(BR).append(SPAN_);
 			lineNumber++;
 		}
-		
+
 		if (session != null)
 			session.setAttribute("lastLine", lineNumber);
 
 		return sbFormatted.toString();
-	}
-	
-	public int getFileLenDiff(File file, HttpSession session) throws IOException {
-		long actualLength = file.length();
-		if (session != null) {	// request can be null, when we're running a JUnit test
-			long lastKnownLength = session.getAttribute("lastKnownLength") == null
-					? 0 : (long) session.getAttribute("lastKnownLength");
-			logger.debug("lastKnownLength=" + lastKnownLength);
-			session.setAttribute("lastKnownLength", actualLength);
-			int fileLenDiff = (int)(actualLength - lastKnownLength);
-			logger.debug("fileLenDiff=" + Math.min(fileLenDiff, MAX_FILELEN_DIFF));
-			return Math.min(fileLenDiff, MAX_FILELEN_DIFF);
-		}
-		return 0;
 	}
 
 	public String tailBytes(File file, HttpSession session, int bytes) throws IOException {
@@ -247,24 +228,28 @@ public class StreamingLogController {
 		}
 
 		FileInputStream fileInputStream = new FileInputStream(file);
-		
+
 		FileChannel channel = fileInputStream.getChannel();
-		session.setAttribute("lastKnownLength", channel.size());
-		
+		long channelSize = channel.size();
 		try {
 			// Read a number of bytes
 			if (bytes > 0) {
-				ByteBuffer buffer = channel.map(FileChannel.MapMode.READ_ONLY, channel.size() - bytes, bytes);
+				long lastKnownLength = session.getAttribute("lastKnownLength") == null
+						? 0 : (long) session.getAttribute("lastKnownLength");
+				bytes = Math.min( (int)(channelSize - lastKnownLength), MAX_FILELEN_DIFF);
+				logger.debug("now(" + channelSize + ")-lastKnownLength(" + lastKnownLength + ")=" + bytes);
+				
+				ByteBuffer buffer = channel.map(FileChannel.MapMode.READ_ONLY, channelSize - bytes, bytes);
 				byte[] buf = new byte[bytes];
 				buffer.get(buf);
 				return new String(buf);
 			}
 
 			// Read a number of lines
-			ByteBuffer buffer = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
-			buffer.position((int) channel.size());
+			ByteBuffer buffer = channel.map(FileChannel.MapMode.READ_ONLY, 0, channelSize);
+			buffer.position((int)channelSize);
 			int count = 0;
-			StringBuilder sb = new StringBuilder((int) channel.size());
+			StringBuilder sb = new StringBuilder((int)channelSize);
 
 			for (long i = channel.size() - 1; i >= 0; i--) {
 				char c = (char) buffer.get((int) i);
@@ -284,7 +269,19 @@ public class StreamingLogController {
 		} finally {
 			channel.close();
 			fileInputStream.close();
+			session.setAttribute("lastKnownLength", channelSize);
 		}
+	}
+
+//	http://stackoverflow.com/questions/3758606/how-to-convert-byte-size-into-human-readable-format-in-java
+	public static String humanReadableByteCount(long bytes) {
+		int unit = 1024;
+		if (bytes < unit) {
+			return bytes + " B";
+		}
+		int exp = (int) (Math.log(bytes) / Math.log(unit));
+		String pre = "KMGTPE".charAt(exp - 1) + "i";
+		return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
 	}
 
 	public String getLogPath() {
@@ -301,6 +298,14 @@ public class StreamingLogController {
 
 	public void setLogFile(String logFile) {
 		this.logFile = logFile;
+	}
+
+	public void setSession(HttpSession session) {
+		this.session = session;
+	}
+
+	public void setTextToBeMarked(String text) {
+		this.textToBeMarked = text;
 	}
 }
 
