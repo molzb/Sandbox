@@ -62,7 +62,8 @@ public class DirWalker {
 				case "htm":
 				case "xhtml": sfx = "html"; break;
 				case "properties":
-				case "txt": sfx = "txt";
+				case "txt": sfx = "txt"; break;
+				default: throw new IllegalArgumentException("No case for " + getSuffix(f));
 			}
 			sb.append(tab).append("<li class='file " + sfx + "'>").append(fname).append("</li>\n");
 		}

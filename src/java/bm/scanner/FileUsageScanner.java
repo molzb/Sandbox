@@ -9,6 +9,7 @@ import com.kirkk.analyzer.framework.bcelbundle.JarPackageImpl;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.sql.Connection;
@@ -38,6 +39,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
@@ -915,8 +917,10 @@ public class FileUsageScanner {
 	 */
 	private List<String> readReferencedClassesInTld(File tldFile) {
 		List<String> referencedClasses = new ArrayList<>();
+		InputStream tldInputStream = null;
 		try {
-			InputSource is = new InputSource(new FileInputStream(tldFile));
+			tldInputStream = new FileInputStream(tldFile);
+			InputSource is = new InputSource(tldInputStream);
 			Document doc = getDocBuilder().parse(is);
 			NodeList tagClassNodes = doc.getElementsByTagName("tag-class");
 			for (int i = 0; i < tagClassNodes.getLength(); i++) {
@@ -924,14 +928,18 @@ public class FileUsageScanner {
 			}
 		} catch (IOException | SAXException ex) {
 			logger.severe(ex.getMessage());
+		} finally {
+			IOUtils.closeQuietly(tldInputStream);
 		}
 		return referencedClasses;
 	}
 
 	private List<String> readReferencedClassesInWebXml(File webXmlFile) {
 		List<String> referencedClasses = new ArrayList<>();
+		InputStream xmlInputStream = null;
 		try {
-			InputSource is = new InputSource(new FileInputStream(webXmlFile));
+			xmlInputStream = new FileInputStream(webXmlFile);
+			InputSource is = new InputSource(xmlInputStream);
 			Document doc = getDocBuilder().parse(is);
 			String[] tags = { "listener-class", "servlet-class", "filter-class", "exception-type"};
 			for (String tag : tags) {
@@ -943,6 +951,8 @@ public class FileUsageScanner {
 			return referencedClasses;
 		} catch (IOException | SAXException ex) {
 			logger.severe(ex.getMessage());
+		} finally {
+			IOUtils.closeQuietly(xmlInputStream);
 		}
 		return referencedClasses;
 	}
@@ -962,8 +972,10 @@ public class FileUsageScanner {
 		tagnameAndAttrib.put("result", "typeHandler");
 		tagnameAndAttrib.put("collection", "javaType");
 
+		InputStream mybatisInputStream = null;
 		try {
-			InputSource is = new InputSource(new FileInputStream(mybatisXml));
+			mybatisInputStream = new FileInputStream(mybatisXml);
+			InputSource is = new InputSource(mybatisInputStream);
 			Document doc = getDocBuilder().parse(is);
 
 			for (Map.Entry<String, String> entries : tagnameAndAttrib.entrySet()) {
@@ -991,8 +1003,10 @@ public class FileUsageScanner {
 	 */
 	private List<String> readReferencedClassesInSpringXml(File springXmlFile) {
 		List<String> referencedClasses = new ArrayList<>();
+		InputStream springInputStream = null;
 		try {
-			InputSource is = new InputSource(new FileInputStream(springXmlFile));
+			springInputStream = new FileInputStream(springXmlFile);
+			InputSource is = new InputSource(springInputStream);
 			Document doc = getDocBuilder().parse(is);
 			NodeList tagClassNodes = doc.getElementsByTagName("bean");
 			for (int i = 0; i < tagClassNodes.getLength(); i++) {
@@ -1007,8 +1021,10 @@ public class FileUsageScanner {
 
 	private List<String> readReferencedClassesInTilesXml(File tileXmlFile) {
 		List<String> referencedClasses = new ArrayList<>();
+		InputStream tileXmlInputStream = null;
 		try {
-			InputSource is = new InputSource(new FileInputStream(tileXmlFile));
+			tileXmlInputStream = new FileInputStream(tileXmlFile);
+			InputSource is = new InputSource(tileXmlInputStream);
 			Document doc = getDocBuilder().parse(is);
 //			<definition name='basic' template='/WEB-INF/views/layout/index.jsp'>
 			NodeList tagClassNodes = doc.getElementsByTagName("definition");

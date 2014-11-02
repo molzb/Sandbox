@@ -8,14 +8,13 @@ import java.io.IOException;
 import javax.servlet.ServletContext;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.tagext.Tag;
 import javax.servlet.jsp.tagext.TagSupport;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("serial")
-public class FileUpload2014Tag extends TagSupport implements Tag {
+public class FileUpload2014Tag extends TagSupport {
 
 	private static final Logger logger = LoggerFactory.getLogger(FileUpload2014Tag.class);
 	/**
@@ -60,7 +59,7 @@ public class FileUpload2014Tag extends TagSupport implements Tag {
 			fileUploadForm = new FileInputStream(new File(pathToFileUploadJsp));
 			byte[] buf = new byte[fileUploadForm.available()];
 			fileUploadForm.read(buf);
-			String fuFormContent = new String(buf);
+			String fuFormContent = new String(buf, "UTF-8");
 
 			fuFormContent = fuFormContent.replace("{contextPath}", contextPath);
 			fuFormContent = fuFormContent.replace("{maxsize}", maxsize);
@@ -93,10 +92,14 @@ public class FileUpload2014Tag extends TagSupport implements Tag {
 				try {
 					File path = new File(uploadDir);
 					if (!path.exists()) {
-						path.mkdirs();
+						boolean mkdirSucceeded = path.mkdirs();
+						if (!mkdirSucceeded)
+							logger.warn("mkdirs didn't succeed");
 					}
 					canWrite = writeTestFile.createNewFile();
-					writeTestFile.delete();
+					boolean deleteSucceeded = writeTestFile.delete();
+					if (!deleteSucceeded)
+						logger.warn("delete {0} didn't succeed", writeTestFile.getAbsolutePath());
 				} catch (IOException ioe) {
 					logger.error(ioe.getMessage(), ioe);
 					logger.error("Target directory writable and existant? Error message:" + ioe.getMessage());

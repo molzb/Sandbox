@@ -83,7 +83,8 @@ public class StreamingLogController {
 						case 0: logger.info(new Date().toString()); break;
 						case 1: logger.warn(new Date().toString()); break;
 						case 2: logger.error(new Date().toString()); break;
-						case 3: throwTestException("TestException at " + SDF_TIME);
+						case 3: throwTestException("TestException at " + SDF_TIME); break;
+						default: throw new IllegalArgumentException("rnd should never have the value " + rnd);
 					}
 					try { Thread.sleep(3000); } catch (Exception e) {}
 				}
@@ -96,7 +97,7 @@ public class StreamingLogController {
 		try {
 			throw new MyException(s);
 		} catch (Exception e) {
-			logger.error(s);
+			logger.error(s, e);
 		}
 	}
 
@@ -242,7 +243,7 @@ public class StreamingLogController {
 				ByteBuffer buffer = channel.map(FileChannel.MapMode.READ_ONLY, channelSize - bytes, bytes);
 				byte[] buf = new byte[bytes];
 				buffer.get(buf);
-				return new String(buf);
+				return new String(buf, "UTF-8");
 			}
 
 			// Read a number of lines
