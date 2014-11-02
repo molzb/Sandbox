@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Kreisel</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width">
+		<script type="text/javascript">
+			function draw() {
+				var c = document.getElementById("myCanvas");
+				var ctx = c.getContext("2d");
+
+				var colors = [
+					['blue', 'yellow'],
+					['white', 'pink'],
+					['green', 'red'],
+					['white', 'black'],
+					['green', 'blue'],
+					['red', 'green', 'blue']
+				];
+
+				for (var i = 0; i < 12; i++) {
+					for (var cIdx = 0, p = 0; p < 120; p += 20, cIdx++) {
+						var cols = colors[cIdx];
+						for (var r = p; r < p + 20; r++) {
+							ctx.beginPath();
+							ctx.arc(150, 150, r, (i - 1) * Math.PI / 6.0, i * Math.PI / 6.0);
+							ctx.strokeStyle = cols[i % cols.length];
+							ctx.stroke();
+						}
+					}
+				}
+			}
+
+			function rotate() {
+				var deg = 0;
+				var c = document.getElementById("myCanvas");
+				var pid = window.setInterval(function() {
+					c.style.transform = 'rotate(' + deg + 'deg)';
+					deg+=4;
+					if (deg === 360) {
+						window.clearInterval(pid);
+					}
+				}, 2);
+			}
+		</script> 
+	</head>
+	<body onload="draw()">
+		<canvas id="myCanvas" width="300" height="300" style="border:1px solid #d3d3d3;">
+			Your browser does not support the HTML5 canvas tag.</canvas>
+	</body>
+</html>
