@@ -60,7 +60,7 @@
 				var c = document.getElementById("myCanvas");
 				if (pid > 0)
 					window.clearInterval(pid);
-				var x = parseFloat(c.style.left), y = parseFloat(c.style.top);
+				var x = parseFloat($(c).css("left")), y = parseFloat($(c).css("top"));
 				pid = window.setInterval(function() {
 					x += deltaX;
 					y += deltaY;
@@ -70,11 +70,11 @@
 					if (deg === 360) {
 						window.clearInterval(pid);
 					}
-				}, 2);
+				}, 10);
 			}
 		</script>
 		<style type="text/css">
-			#myCanvas { position: absolute; left: 0; top: 0; }
+			#myCanvas { position: absolute; left: 0px; top: 0px; }
 			#finish { position: absolute; left: 500px; top: 500px; width: 250px; height: 250px; border-radius: 250px; 
 					  top: 50%; left: 50%;
 					  background-color: #FFD700; font-size: 24px; font-family: arial; }
