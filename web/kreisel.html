@@ -4,7 +4,31 @@
 		<title>Kreisel</title>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width">
+		<script type="text/javascript" src="js/jquery-1.11.1.js"></script>
 		<script type="text/javascript">
+			"use strict";
+			var dragX = 0, dragY = 0, nowT = 0;
+			var dragDeltaX = 0, dragDeltaY = 0, deltaT = 0;
+			var deltaX = 0, deltaY = 0;
+			var pid = 0;
+			$(document).ready(function() {
+				$("canvas").mousedown(function(e) {
+					dragX = e.pageX;
+					dragY = e.pageY;
+					nowT = window.performance.now();
+				});
+				$("canvas").mouseup(function(e) {
+					dragDeltaX = e.pageX - dragX;
+					dragDeltaY = e.pageY - dragY;
+					deltaT = parseInt(window.performance.now() - nowT);
+					deltaX = dragDeltaX / deltaT;
+					deltaY = dragDeltaY / deltaT;
+					console.log("Drag  Delta X/Y/t= " + dragDeltaX + "/" + dragDeltaY + "/" + deltaT);
+					console.log("Delta X/Y=" + deltaX + "/" + deltaY);
+					rotate(deltaX, deltaY, deltaT);
+				});
+			});
+	
 			function draw() {
 				var c = document.getElementById("myCanvas");
 				var ctx = c.getContext("2d");
@@ -31,21 +55,37 @@
 				}
 			}
 
-			function rotate() {
+			function rotate(deltaX, deltaY, deltaT) {
 				var deg = 0;
 				var c = document.getElementById("myCanvas");
-				var pid = window.setInterval(function() {
+				if (pid > 0)
+					window.clearInterval(pid);
+				var x = parseFloat(c.style.left), y = parseFloat(c.style.top);
+				pid = window.setInterval(function() {
+					x += deltaX;
+					y += deltaY;
+					c.style.left = Math.round(x) + "px", c.style.top = Math.round(y) + "px";
 					c.style.transform = 'rotate(' + deg + 'deg)';
-					deg+=4;
+					deg = (deltaX > 0) ? deg + 4 : deg -4;
 					if (deg === 360) {
 						window.clearInterval(pid);
 					}
 				}, 2);
 			}
-		</script> 
+		</script>
+		<style type="text/css">
+			#myCanvas { position: absolute; left: 0; top: 0; }
+			#finish { position: absolute; left: 500px; top: 500px; width: 250px; height: 250px; border-radius: 250px; 
+					  top: 50%; left: 50%;
+					  background-color: #FFD700; font-size: 24px; font-family: arial; }
+			#finish h1 { text-align: center; vertical-align: middle; padding-top: 50px; }
+		</style>
 	</head>
 	<body onload="draw()">
-		<canvas id="myCanvas" width="300" height="300" style="border:1px solid #d3d3d3;">
+		<canvas id="myCanvas" width="300" height="300">
 			Your browser does not support the HTML5 canvas tag.</canvas>
+		<div id="finish">
+			<h1>Finish</h1>
+		</div>
 	</body>
 </html>
