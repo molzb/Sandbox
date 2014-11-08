@@ -73,8 +73,9 @@ public class TestMultiThreading {
 	}
 
 	private List<String> generateData() {
+		Random rnd = new Random();
 		for (int i = 0; i < COUNT; i++) {
-			double x = new Random().nextDouble() * COUNT;
+			double x = rnd.nextDouble() * COUNT;
 			strNumbers.add(String.valueOf(x));
 		}
 		return strNumbers;
