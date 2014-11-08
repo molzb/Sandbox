@@ -10,12 +10,26 @@
 			var dragX = 0, dragY = 0, nowT = 0;
 			var dragDeltaX = 0, dragDeltaY = 0, deltaT = 0;
 			var deltaX = 0, deltaY = 0;
-			var pid = 0;
+			var pid = 0, timeId = 0;
+
+			var cntFinishs = 5;
+			var cntRemainFinishs = 5;
+			var cntStrokes = 0;
+			var cntTime = 0.0;
+			var score = 0;
+			var hiscore = 0;
+
 			$(document).ready(function() {
+				blinkArrows();
+
 				$("canvas").mousedown(function(e) {
 					dragX = e.pageX;
 					dragY = e.pageY;
 					nowT = window.performance.now();
+					
+					if (timeId === 0) {
+						updateTime();
+					}
 				});
 				$("canvas").mouseup(function(e) {
 					dragDeltaX = e.pageX - dragX;
@@ -24,11 +38,40 @@
 					deltaX = dragDeltaX / deltaT;
 					deltaY = dragDeltaY / deltaT;
 					console.log("Drag  Delta X/Y/t= " + dragDeltaX + "/" + dragDeltaY + "/" + deltaT);
-					console.log("Delta X/Y=" + deltaX + "/" + deltaY);
-					rotate(deltaX, deltaY, deltaT);
+					$("#strokes").text(++cntStrokes);
+					showDebug(deltaX, deltaY, deltaT);
+
+					rotate(deltaX, deltaY);
 				});
 			});
-	
+
+			function updateTime() {
+				var timeInterval = 100;
+				timeId = window.setInterval(function() {
+					cntTime += 0.1;
+					var strTime = Math.round(cntTime * 10) / 10;
+					$("#time").text(strTime + " s");
+				}, timeInterval);
+			}
+
+			function blinkArrows() {
+				var blink = 0;
+				var blinkId = window.setInterval(function() {
+					var vis = $("#arrow1,#arrow2").css("visibility");
+					$("#arrow1,#arrow2").css("visibility", vis === "hidden" ? "visible" : "hidden");
+					if (blink++ >= 3) {
+						window.clearInterval(blinkId);
+						window.setTimeout(function() { $("#explanation").hide(); }, 1000);
+					}
+				}, 500);
+			}
+
+			function showDebug(deltaX, deltaY, deltaT) {
+				$("#debug #dx").text(Math.round(deltaX * 100) / 100);
+				$("#debug #dy").text(Math.round(deltaY * 100) / 100);
+				$("#debug #dt").text(deltaT + " ms");
+			}
+
 			function draw() {
 				var c = document.getElementById("myCanvas");
 				var ctx = c.getContext("2d");
@@ -55,37 +98,115 @@
 				}
 			}
 
-			function rotate(deltaX, deltaY, deltaT) {
+			function rotate(deltaX, deltaY) {
+				var animSteps = 100;
 				var deg = 0;
 				var c = document.getElementById("myCanvas");
 				if (pid > 0)
 					window.clearInterval(pid);
 				var x = parseFloat($(c).css("left")), y = parseFloat($(c).css("top"));
 				pid = window.setInterval(function() {
-					x += deltaX;
-					y += deltaY;
+					x += deltaX * 5;
+					y += deltaY * 5;
 					c.style.left = Math.round(x) + "px", c.style.top = Math.round(y) + "px";
 					c.style.transform = 'rotate(' + deg + 'deg)';
 					deg = (deltaX > 0) ? deg + 4 : deg -4;
-					if (deg === 360) {
+
+					readDistance();
+
+					if (animSteps-- === 0) {
 						window.clearInterval(pid);
 					}
 				}, 10);
 			}
+
+			function readDistance() {
+				var cx = parseInt( $("#myCanvas").css("left") ), cy = parseInt( $("#myCanvas").css("top") );
+				var fx = parseInt( $("#finish").css("left") ), fy = parseInt( $("#finish").css("top") );
+				var distX = cx - fx, distY = cy - fy;
+				var distXY = parseInt(Math.sqrt(distX * distX + distY * distY));
+				$("#debug #dDist").text( Math.round(distXY * 100) / 100 );
+				if (distXY < 256) {
+					changeBgFinish(distXY);
+					if (distXY < 50) {
+						if (cntRemainFinishs-- <= 0) {
+							$("#done").show();
+							window.clearInterval(timeId);
+							score += parseInt((100.0 - cntTime) * 100);
+							$("#score").text(score);
+							if (score > hiscore) {
+								hiscore = score;
+								$("#hiscore").text(hiscore);
+							}
+						} else {
+							moveFinish();
+							score += 1000;
+							$("#score").text(score);
+						}
+					}
+				}
+			}
+
+			function changeBgFinish(distXY) {
+				var bg = $("#finish").css("background-color"); // -> rgb(1,23,123)
+				var rgbStr = bg.substring(4, bg.length-1);
+				var rgb = rgbStr.split(",");
+				var r = distXY, g = 255 - distXY, b = rgb[2];
+				$("#finish").css("background-color", "rgb(" + r + "," + g + ", " + b + ")");
+			}
+
+			function moveFinish() {
+				var body = $("body"), finish = $("#finish");
+				var width = parseInt(body.css("width")), height = body.css("height");
+				var maxX = width - parseInt(finish.css("width"));
+				var maxY = height - parseInt(finish.css("height"));
+				var newX = parseInt(Math.random() * maxX), newY = parseInt(Math.random() * maxY);
+				finish.css("left", newX + "px").css("top", newY + "px");
+			}
 		</script>
 		<style type="text/css">
-			#myCanvas { position: absolute; left: 0px; top: 0px; }
-			#finish { position: absolute; left: 500px; top: 500px; width: 250px; height: 250px; border-radius: 250px; 
-					  top: 50%; left: 50%;
-					  background-color: #FFD700; font-size: 24px; font-family: arial; }
-			#finish h1 { text-align: center; vertical-align: middle; padding-top: 50px; }
+			@font-face { font-family: crayonFont; src: url(images/PastelCrayon.ttf); }
+			body { background-image: url(images/karo.png); background-repeat: repeat;
+				   font-family: crayonFont; overflow: hidden; }
+			#myCanvas { position: absolute; left: 50px; top: 100px; z-index: 2; }
+			#finish { position: absolute; left: 500px; top: 500px; width: 250px; height: 250px; border-radius: 250px;
+					  background-color: red; font-size: 36px; }
+			#finish h1 { text-align: center; vertical-align: middle; padding-top: 50px; color: white; }
+			#debug { float: right; height: 100px; width: 100px;
+					 background-color: #EEEEEE; color: #999999; }
+			#done { text-align: center; font-size: 72px; margin-top: 25%; display: none; }
+			.arrow { position: absolute; visibility: hidden; }
+			.arrow#arrow1 { top: 0px; left: 50px; }
+			.arrow#arrow2 { top: 350px; left: 50px; }
+			#performance, #scores { font-size: 36px; color: #999999; text-align: center; }
+			#performance > span, #scores > span { display: inline-block; width: 20%; text-align: right; }
+			#performance #strokes, #performance #time,
+			#scores #score, #scores #hiscore { width: 10%; }
 		</style>
 	</head>
 	<body onload="draw()">
+		<div id="debug">
+			&Delta;x: <span id="dx">&nbsp;</span><br/>
+			&Delta;y: <span id="dy">&nbsp;</span><br/>
+			&Delta;t: <span id="dt">&nbsp;</span><br/>
+			&Delta;Dist: <span id="dDist">&nbsp;</span>
+		</div>
 		<canvas id="myCanvas" width="300" height="300">
 			Your browser does not support the HTML5 canvas tag.</canvas>
+		<img id="arrow1" class="arrow" src="images/arrowRight.png" alt="Arrow"/>
+		<img id="arrow2" class="arrow" src="images/arrowRight.png" alt="Arrow"/>
 		<div id="finish">
 			<h1>Finish</h1>
 		</div>
+		<div id="performance">
+			<span>Strokes:</span><span id="strokes">0</span>
+			<span>Time:</span><span id="time">Go!</span>
+		</div>
+		<div id="scores">
+			<span>Score:</span><span id="score">0</span>
+			<span>Hiscore:</span><span id="hiscore">0</span>
+		</div>
+
+		<div id="done">You made it!</div>
 	</body>
 </html>
