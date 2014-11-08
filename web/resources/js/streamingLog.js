@@ -11,7 +11,7 @@ $(document).ready(function() {
 	});
 	// Tooltip doesn't work with button groups. TODO
 	//	$("#tdFilter .error, #tdFilter .warn, #tdFilter .info, #tdFilter .text").	
-	$("#btnMark, #btnMarkRegex").
+	$(".btnMark, .btnMarkRegex").
 			data("toggle", "tooltip").
 			data("placement", "top").
 			tooltip();
@@ -24,11 +24,11 @@ var pollId = 0;
 var logInfoId = 0;
 
 function updateLog() {
-	$.ajax({url: "StreamingLog.disp?lines=" + $("#txtLines").val()}).success(function(html) {
+	$.ajax({url: "StreamingLog.disp?lines=" + $(".txtLines").val()}).success(function(html) {
 		$(".log").html(html);
 		pollLog();
-		$("#btnUpdateLog").attr("disabled", true);
-		$("#btnPauseLog").attr("disabled", false);
+		$(".btnUpdateLog").attr("disabled", true);
+		$(".btnPauseLog").attr("disabled", false);
 	});
 }
 
@@ -36,14 +36,14 @@ function updateLogInfo() {
 	$.ajax({url: "StreamingLogInfo.disp", dataType: "json", cache: false}).success(function(json) {
 		var txt = "Len: " + json.len + ", Diff: " + json.diff + ", " + json.time;
 		console.log("Text=" + txt);
-		$("#logInfo").text(txt);
+		$(".logInfo").text(txt);
 	}).fail(function(xhr, textStatus) {
 		console.log(textStatus);
 	});
 }
 
 function pollLog() {
-	var interval = $("#txtPollInterval").val() * 1000;
+	var interval = $(".txtPollInterval").val() * 1000;
 	pollId = window.setInterval(function() {
 		$.ajax({url: "StreamingLog.disp?bytesDiff=true", cache: false}).success(function(html) {
 			$(".log").append(html);
@@ -54,7 +54,7 @@ function pollLog() {
 	logInfoId = window.setInterval(function() {
 		updateLogInfo();
 	}, interval * 5);
-	$("#logInfo").removeClass("error");
+	$(".logInfo").removeClass("error");
 }
 
 function pauseLog() {
@@ -62,9 +62,9 @@ function pauseLog() {
 		window.clearInterval(pollId);
 	if (logInfoId > 0)
 		window.clearInterval(logInfoId);
-	$("#btnPauseLog").attr("disabled", true);
-	$("#btnUpdateLog").attr("disabled", false);
-	$("#logInfo").addClass("error").text("Paused ...");
+	$(".btnPauseLog").attr("disabled", true);
+	$(".btnUpdateLog").attr("disabled", false);
+	$(".logInfo").addClass("error").text("Paused ...");
 }
 
 function clearLog() {
@@ -74,7 +74,7 @@ function clearLog() {
 
 function mark() {
 	if (markValidate()) {
-		var term = $("#txtTerm").val();
+		var term = $(".txtTerm").val();
 		var markCount = 0;
 		$(".log span").each(function() {
 			$(this).removeClass("highlight");
@@ -83,12 +83,12 @@ function mark() {
 				markCount++;
 			}
 		});
-		$("#spanMark .count").text(markCount === 0 ? "Not found" : "Found " + markCount + " times");
+		$(".spanMark .count").text(markCount === 0 ? "Not found" : "Found " + markCount + " times");
 	}
 }
 function markRegex() {
 	if (markValidate()) {
-		var term = $("#txtTerm").val();
+		var term = $(".txtTerm").val();
 		var markCount = 0;
 		var regex = new RegExp(term);
 		$(".log span").each(function() {
@@ -98,11 +98,11 @@ function markRegex() {
 				markCount++;
 			}
 		});
-		$("#spanMark .count").text(markCount === 0 ? "Not found" : "Found " + markCount + " times");
+		$(".spanMark .count").text(markCount === 0 ? "Not found" : "Found " + markCount + " times");
 	}
 }
 function markValidate() {
-	var term = $("#txtTerm").val();
+	var term = $(".txtTerm").val();
 	if (term === "") {
 		alert("Please enter some text");
 		return false;
@@ -114,19 +114,19 @@ function filter(elem) {
 	var cnt = 0;
 	if ($(elem).hasClass("all")) {
 		$(".log > span").show();
-		$("#tdFilter .count").text("Show all");
+		$(".tdFilter .count").text("Show all");
 	} else if ($(elem).hasClass("error")) {
 		cnt = filterText("ERROR ");
-		$("#tdFilter .count").text("Showing " + cnt + " lines");
+		$(".tdFilter .count").text("Showing " + cnt + " lines");
 	} else if ($(elem).hasClass("warn")) {
 		cnt = filterText("WARN ");
-		$("#tdFilter .count").text("Showing " + cnt + " lines");
+		$(".tdFilter .count").text("Showing " + cnt + " lines");
 	} else if ($(elem).hasClass("info")) {
 		cnt = filterText("INFO ");
-		$("#tdFilter .count").text("Showing " + cnt + " lines");
+		$(".tdFilter .count").text("Showing " + cnt + " lines");
 	} else if ($(elem).hasClass("text")) {
-		cnt = filterText($("#txtFilter").val());
-		$("#tdFilter .count").text("Showing " + cnt + " lines");
+		cnt = filterText($(".txtFilter").val());
+		$(".tdFilter .count").text("Showing " + cnt + " lines");
 	}
 }
 
