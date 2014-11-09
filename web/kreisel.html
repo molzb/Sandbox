@@ -15,7 +15,7 @@
 			var cntFinishs = 5;
 			var cntRemainFinishs = 5;
 			var cntStrokes = 0;
-			var cntTime = 0.0;
+			var cntTime = 90.0;
 			var score = 0;
 			var hiscore = 0;
 
@@ -48,7 +48,7 @@
 			function updateTime() {
 				var timeInterval = 100;
 				timeId = window.setInterval(function() {
-					cntTime += 0.1;
+					cntTime -= 0.1;
 					var strTime = Math.round(cntTime * 10) / 10;
 					$("#time").text(strTime + " s");
 				}, timeInterval);
@@ -90,7 +90,7 @@
 						var cols = colors[cIdx];
 						for (var r = p; r < p + 20; r++) {
 							ctx.beginPath();
-							ctx.arc(150, 150, r, (i - 1) * Math.PI / 6.0, i * Math.PI / 6.0);
+							ctx.arc(125, 125, r, (i - 1) * Math.PI / 6.0, i * Math.PI / 6.0);
 							ctx.strokeStyle = cols[i % cols.length];
 							ctx.stroke();
 						}
@@ -112,12 +112,36 @@
 					c.style.transform = 'rotate(' + deg + 'deg)';
 					deg = (deltaX > 0) ? deg + 4 : deg -4;
 
+					checkIfLost();
 					readDistance();
 
 					if (animSteps-- === 0) {
 						window.clearInterval(pid);
 					}
 				}, 10);
+			}
+			
+			function checkIfLost() {
+				var canvas = $("#myCanvas");
+				var width = parseInt(canvas.css("width")), height = parseInt(canvas.css("height"));
+				var left  = parseInt(canvas.css("left")),  top = parseInt(canvas.css("top"));
+				if (left < -(width/2) || top < -(height/2)) {
+					if (pid > 0)
+						window.clearInterval(pid);
+					$("#lost").show();
+					window.setTimeout(function() {
+						$("#lost").hide();
+						resetPosition();
+					}, 2000);
+				}
+			}
+			
+			function resetPosition() {
+				var body = $("body"), finish = $("#finish");
+				var width = parseInt(body.css("width")), height = parseInt(body.css("height"));
+				var maxX = width - parseInt(finish.css("width"));
+				var maxY = height - parseInt(finish.css("height"));
+				$("#myCanvas").css("left", maxX / 2 + "px").css("top", maxY / 2 + "px");
 			}
 
 			function readDistance() {
@@ -132,7 +156,7 @@
 						if (cntRemainFinishs-- <= 0) {
 							$("#done").show();
 							window.clearInterval(timeId);
-							score += parseInt((100.0 - cntTime) * 100);
+							score += parseInt(cntTime * 100);
 							$("#score").text(score);
 							if (score > hiscore) {
 								hiscore = score;
@@ -157,10 +181,11 @@
 
 			function moveFinish() {
 				var body = $("body"), finish = $("#finish");
-				var width = parseInt(body.css("width")), height = body.css("height");
+				var width = parseInt(body.css("width")), height = parseInt(body.css("height"));
 				var maxX = width - parseInt(finish.css("width"));
 				var maxY = height - parseInt(finish.css("height"));
 				var newX = parseInt(Math.random() * maxX), newY = parseInt(Math.random() * maxY);
+				console.log("maxY/newY=" + newY);
 				finish.css("left", newX + "px").css("top", newY + "px");
 			}
 		</script>
@@ -174,7 +199,7 @@
 			#finish h1 { text-align: center; vertical-align: middle; padding-top: 50px; color: white; }
 			#debug { float: right; height: 100px; width: 100px;
 					 background-color: #EEEEEE; color: #999999; }
-			#done { text-align: center; font-size: 72px; margin-top: 25%; display: none; }
+			#done, #lost { text-align: center; font-size: 72px; margin-top: 25%; display: none; z-index: 3; }
 			.arrow { position: absolute; visibility: hidden; }
 			.arrow#arrow1 { top: 0px; left: 50px; }
 			.arrow#arrow2 { top: 350px; left: 50px; }
@@ -191,7 +216,7 @@
 			&Delta;t: <span id="dt">&nbsp;</span><br/>
 			&Delta;Dist: <span id="dDist">&nbsp;</span>
 		</div>
-		<canvas id="myCanvas" width="300" height="300">
+		<canvas id="myCanvas" width="250" height="250">
 			Your browser does not support the HTML5 canvas tag.</canvas>
 		<img id="arrow1" class="arrow" src="images/arrowRight.png" alt="Arrow"/>
 		<img id="arrow2" class="arrow" src="images/arrowRight.png" alt="Arrow"/>
@@ -208,5 +233,6 @@
 		</div>
 
 		<div id="done">You made it!</div>
+		<div id="lost">You're lost!<br>You lose 2s.</div>
 	</body>
 </html>
