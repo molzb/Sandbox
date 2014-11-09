@@ -29,6 +29,18 @@
                 <library dirs="200">
                     <file>${libs.Lombok.classpath}</file>
                 </library>
+                <library dirs="200">
+                    <file>${libs.JarAnalyzer.classpath}</file>
+                    <path-in-war>WEB-INF/lib</path-in-war>
+                </library>
+                <library dirs="200">
+                    <file>${libs.CommonsLang.classpath}</file>
+                    <path-in-war>WEB-INF/lib</path-in-war>
+                </library>
+                <library dirs="200">
+                    <file>${libs.Log4j.classpath}</file>
+                    <path-in-war>WEB-INF/lib</path-in-war>
+                </library>
             </web-module-libraries>
             <web-module-additional-libraries/>
             <source-roots>
@@ -38,5 +50,18 @@
                 <root id="test.src.dir"/>
             </test-roots>
         </data>
+        <spring-data xmlns="http://www.netbeans.org/ns/spring-data/1">
+            <config-files>
+                <config-file>web/WEB-INF/classes/META-INF/spring/applicationContext.xml</config-file>
+                <config-file>web/WEB-INF/classes/META-INF/spring/spring-cache.xml</config-file>
+                <config-file>web/WEB-INF/classes/META-INF/spring/spring-config.xml</config-file>
+                <config-file>web/WEB-INF/classes/META-INF/spring/spring-excel-views.xml</config-file>
+                <config-file>web/WEB-INF/classes/META-INF/spring/spring-persistence.xml</config-file>
+                <config-file>web/WEB-INF/classes/META-INF/spring/spring-security.xml</config-file>
+                <config-file>web/WEB-INF/classes/META-INF/spring/springapp-servlet.xml</config-file>
+                <config-file>web/WEB-INF/mvc-dispatcher-servlet.xml</config-file>
+            </config-files>
+            <config-file-groups/>
+        </spring-data>
     </configuration>
 </project>
