@@ -27,7 +27,7 @@ body { background-image: url(../../images/karo.png); background-repeat: repeat;
 		  border: 2px solid black; border-radius: 120px 10px / 10px 120px;
 		  font-size: 24px; background-color: white; }
 .splash.hiscores { display: none; min-height: 450px; }
-.splash.hiscores table { width: 100%; }
+.splash.hiscores table { width: 100%; padding: 0 10px; }
 .splash.hiscores table th { font-size: 28px; text-align: left; }
 .splash > h1 { text-align: center; }
 .splash .info { text-align: center; display: table; width: 100%; padding-top: 20px; }

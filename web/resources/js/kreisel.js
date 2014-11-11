@@ -15,8 +15,8 @@ var cntTime = 90.0;
 var score = 0;
 var hiscore = 0;
 
-var hiscores = [{name: "bm", score: 1000},{name: "bm", score: 2000},{name: "bm", score: 3000},
-	{name: "bm", score: 4000},{name: "bm", score: 5000}];
+var hiscores = [{name: "bm1", score: 5000},{name: "bm2", score: 4000},{name: "bm3", score: 3000},
+	{name: "bm4", score: 2000},{name: "bm5", score: 1000}];
 
 $(document).ready(function() {
 	blinkArrows();
@@ -215,7 +215,21 @@ function showHiscores() {
 	$(".splash.hiscores").show();
 	var tbl = $(".hiscores table");
 	for (var i = 0; i < 5; i++) {
-		tbl.find("tr:eq(" + i + ") td.score").text(hiscores[i].score);
-		tbl.find("tr:eq(" + i + ") td.name").text(hiscores[i].name);
+		tbl.find("tr:eq(" + (i+1) + ") td.score").text(hiscores[i].score);
+		tbl.find("tr:eq(" + (i+1) + ") td.name").text(hiscores[i].name);
+	}
+}
+
+function enterHiscore(myScore) {
+	var tbl = $(".hiscores table");
+	if (myScore > hiscores[hiscores.length-1].score) {
+		var pos = 0;
+		for (pos = 0; pos < hiscores.length; pos++) {
+			if (myScore > hiscores[pos].score) {
+				break;
+			}
+		}
+		tbl.find("tr:eq(" + (pos) + ") td.score").text(myScore);
+		tbl.find("tr:eq(" + (pos) + ") td.name").text("TODO");
 	}
 }
