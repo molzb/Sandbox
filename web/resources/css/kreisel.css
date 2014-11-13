@@ -22,6 +22,7 @@ body { background-image: url(../../images/karo.png); background-repeat: repeat;
 #performance #strokes, #performance #time,
 #scores #score, #scores #hiscore { width: 10%; }
 #performance #time.timeWarn { color: red; }
+
 .splash { position: absolute; min-width: 300px; width: 30%; min-height: 300px; height: 25%; 
 		  margin-left: 35%; margin-top: 10%;
 		  border: 2px solid black; border-radius: 120px 10px / 10px 120px;
@@ -29,16 +30,21 @@ body { background-image: url(../../images/karo.png); background-repeat: repeat;
 .splash.hiscores { display: none; min-height: 450px; }
 .splash.hiscores table { width: 100%; padding: 0 10px; }
 .splash.hiscores table th { font-size: 28px; text-align: left; }
-.splash > h1 { text-align: center; }
-.splash .info { text-align: center; display: table; width: 100%; padding-top: 20px; }
-.splash .info { display: table; width: 100%; text-align: center; }
+@keyframes blink { 0% { color: red; } 100% { color: green; } }
+.splash.hiscores table tr.blink { animation: blink 0.5s linear infinite; } 
 .splash.hiscores #tblHiscores td.score, .splash.hiscores #tblHiscores td.name {
 	text-align: right;
 }
+
+.splash > h1 { text-align: center; }
+.splash .info { text-align: center; display: table; width: 100%; padding-top: 20px; }
+.splash .info { display: table; width: 100%; text-align: center; }
+
 .click { background-image: url(../../images/hatching.png); background-repeat: repeat; 
 		 font-size: 24px; border: 2px solid black; padding: 10px; }
 .click:active { font-weight: normal; }
 .click:hover { font-weight: bold; }
+
 #outoftime .click { position: absolute; text-align: center; width: 100%; }
 #copyright { position: absolute; bottom: 20px; right: 20px; color: #999999;
 			 transform: rotate(90deg); transform-origin: right; }

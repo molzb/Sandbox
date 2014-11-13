@@ -17,6 +17,7 @@ var hiscore = 0;
 
 var hiscores = [{name: "bm1", score: 5000},{name: "bm2", score: 4000},{name: "bm3", score: 3000},
 	{name: "bm4", score: 2000},{name: "bm5", score: 1000}];
+var CNT_HISCORES = 5; 
 
 $(document).ready(function() {
 	blinkArrows();
@@ -214,22 +215,28 @@ function moveFinish() {
 function showHiscores() {
 	$(".splash.hiscores").show();
 	var tbl = $(".hiscores table");
-	for (var i = 0; i < 5; i++) {
+	for (var i = 0; i < CNT_HISCORES; i++) {
 		tbl.find("tr:eq(" + (i+1) + ") td.score").text(hiscores[i].score);
 		tbl.find("tr:eq(" + (i+1) + ") td.name").text(hiscores[i].name);
 	}
 }
 
 function enterHiscore(myScore) {
+	if (myScore === undefined) {
+		console.warn("enterHiscore called without argument");
+		return;
+	}
 	var tbl = $(".hiscores table");
-	if (myScore > hiscores[hiscores.length-1].score) {
+	if (myScore > hiscores[CNT_HISCORES-1].score) {
 		var pos = 0;
-		for (pos = 0; pos < hiscores.length; pos++) {
+		for (pos = 0; pos < CNT_HISCORES; pos++) {
 			if (myScore > hiscores[pos].score) {
 				break;
 			}
 		}
-		tbl.find("tr:eq(" + (pos) + ") td.score").text(myScore);
-		tbl.find("tr:eq(" + (pos) + ") td.name").text("TODO");
+		hiscores.splice(pos, 0, {name: "___", score: myScore});
+		hiscores.splice(CNT_HISCORES,1);	// remove last element
+		tbl.find("tr:eq(" + (pos+1) + ") td.score").text(myScore);
+		tbl.find("tr:eq(" + (pos+1) + ") td.name").text("___");
 	}
 }
